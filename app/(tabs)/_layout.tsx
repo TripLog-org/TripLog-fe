@@ -22,6 +22,7 @@ export default function TabsLayout() {
         name="map"
         options={{
           title: '여행 지도',
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map-outline" size={size} color={color} />
           ),

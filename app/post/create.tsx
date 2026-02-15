@@ -31,6 +31,8 @@ export default function PostCreateScreen() {
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
 
+  const isFormValid = images.length > 0;
+
   const pickImages = async () => {
     const remaining = MAX_IMAGES - images.length;
     if (remaining <= 0) {
@@ -106,100 +108,130 @@ export default function PostCreateScreen() {
     <>
       <Stack.Screen
         options={{
-          title: '새 게시물',
-          headerRight: () => (
-            <Pressable onPress={handleSubmit} disabled={createPost.isPending}>
-              <Text className="text-base font-semibold text-primary">
-                {createPost.isPending ? '게시 중...' : '게시'}
-              </Text>
+          title: '여행 추가 하기',
+          headerTitleAlign: 'center',
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} hitSlop={8}>
+              <Ionicons name="chevron-back" size={24} color="#1A1A1A" />
             </Pressable>
           ),
         }}
       />
 
-      <SafeAreaView className="flex-1 bg-white" edges={['bottom']}>
-        <ScrollView className="flex-1 p-4">
-          {/* 내용 입력 */}
-          <TextInput
-            value={content}
-            onChangeText={setContent}
-            placeholder="여행 이야기를 들려주세요..."
-            multiline
-            className="min-h-[120px] text-base leading-6 text-text"
-            placeholderTextColor="#9CA3AF"
-            textAlignVertical="top"
-          />
+      <SafeAreaView className="flex-1 bg-surface" edges={['bottom']}>
+        <ScrollView className="flex-1 px-5 pt-4" showsVerticalScrollIndicator={false}>
+          {/* ── 사진 섹션 ── */}
+          <Text className="mb-3 text-base font-bold text-text">사진</Text>
 
-          {/* 해시태그 */}
-          <View className="mt-4 border-t border-border pt-4">
-            <Text className="mb-2 text-sm font-semibold text-text">해시태그</Text>
-            <View className="flex-row items-center gap-2">
+          {/* 추가 버튼 */}
+          <Pressable
+            onPress={pickImages}
+            className="mb-3 h-[88px] w-[88px] items-center justify-center rounded-xl border border-border bg-white"
+          >
+            <View className="h-8 w-8 items-center justify-center rounded-full bg-primary">
+              <Text className="text-lg font-bold leading-5 text-white">+</Text>
+            </View>
+          </Pressable>
+
+          {/* 선택된 이미지 목록 */}
+          {images.length > 0 && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 8 }}
+              className="mb-2"
+            >
+              {images.map((img, index) => (
+                <View key={img.uri} className="relative">
+                  <Image
+                    source={{ uri: img.uri }}
+                    className="h-[140px] w-[140px] rounded-xl"
+                    resizeMode="cover"
+                  />
+                  <Pressable
+                    onPress={() => removeImage(index)}
+                    className="absolute right-1.5 top-1.5"
+                  >
+                    <Ionicons name="close-circle" size={24} color="#ebebeb" />
+                  </Pressable>
+                </View>
+              ))}
+            </ScrollView>
+          )}
+
+          {/* ── 텍스트 입력 섹션 ── */}
+          <Text className="mb-3 mt-6 text-base font-bold text-text">텍스트 입력</Text>
+          <View className="rounded-xl border border-border bg-white p-4">
+            <TextInput
+              value={content}
+              onChangeText={setContent}
+              placeholder="내용을 입력해주세요"
+              multiline
+              className="min-h-[120px] text-sm leading-5 text-text"
+              placeholderTextColor="#9CA3AF"
+              textAlignVertical="top"
+            />
+          </View>
+
+          {/* ── 해시태그 섹션 ── */}
+          <Text className="mb-3 mt-6 text-base font-bold text-text">해시태그 #</Text>
+          <View className="flex-row items-center gap-2">
+            <View className="flex-1 flex-row items-center rounded-xl border border-border bg-white px-4 py-2.5">
+              <Text className="mr-1 text-sm text-text-tertiary">#</Text>
               <TextInput
                 value={tagInput}
                 onChangeText={setTagInput}
                 onSubmitEditing={addTag}
-                placeholder="#태그 입력"
-                className="flex-1 rounded-lg bg-surface px-3 py-2 text-sm text-text"
+                placeholder="키워드를 입력해주세요."
+                className="flex-1 text-sm text-text"
                 placeholderTextColor="#9CA3AF"
                 returnKeyType="done"
               />
-              <Pressable onPress={addTag} className="rounded-lg bg-primary px-3 py-2">
-                <Text className="text-sm font-medium text-white">추가</Text>
-              </Pressable>
             </View>
-            {tags.length > 0 && (
-              <View className="mt-2 flex-row flex-wrap gap-1">
-                {tags.map((tag) => (
-                  <Pressable
-                    key={tag}
-                    onPress={() => removeTag(tag)}
-                    className="flex-row items-center rounded-full bg-primary/10 px-2.5 py-1"
-                  >
-                    <Text className="text-xs text-primary">#{tag}</Text>
-                    <Ionicons name="close" size={12} color="#4A90D9" className="ml-1" />
-                  </Pressable>
-                ))}
-              </View>
-            )}
+            <Pressable
+              onPress={addTag}
+              className="rounded-xl px-4 py-2.5 bg-primary"
+            >
+              <Text className="text-sm font-semibold text-white">추가</Text>
+            </Pressable>
           </View>
 
-          {/* 이미지 선택 */}
-          <View className="mt-4 border-t border-border pt-4">
-            <View className="flex-row items-center justify-between">
-              <Text className="text-sm font-semibold text-text">
-                사진 ({images.length}/{MAX_IMAGES})
-              </Text>
-              <Pressable onPress={pickImages} className="flex-row items-center gap-1">
-                <Ionicons name="camera-outline" size={20} color="#4A90D9" />
-                <Text className="text-sm text-primary">추가</Text>
-              </Pressable>
+          {tags.length > 0 && (
+            <View className="mt-3 flex-row flex-wrap gap-2">
+              {tags.map((tag) => (
+                <Pressable
+                  key={tag}
+                  onPress={() => removeTag(tag)}
+                  className="rounded-full bg-[#DDEEFA] px-4 py-1.5"
+                >
+                  <Text className="text-sm font-semibold text-primary">#{tag}</Text>
+                </Pressable>
+              ))}
             </View>
+          )}
 
-            {images.length > 0 && (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                className="mt-3"
-              >
-                {images.map((img, index) => (
-                  <View key={img.uri} className="relative mr-2">
-                    <Image
-                      source={{ uri: img.uri }}
-                      className="h-24 w-24 rounded-lg"
-                      resizeMode="cover"
-                    />
-                    <Pressable
-                      onPress={() => removeImage(index)}
-                      className="absolute -right-1 -top-1 h-5 w-5 items-center justify-center rounded-full bg-error"
-                    >
-                      <Ionicons name="close" size={12} color="#FFFFFF" />
-                    </Pressable>
-                  </View>
-                ))}
-              </ScrollView>
-            )}
-          </View>
+          {/* 하단 여백 확보 */}
+          <View className="h-6" />
         </ScrollView>
+
+        {/* ── 하단 다음 버튼 ── */}
+        <View className="px-5 pb-4 pt-2">
+          <Pressable
+            onPress={handleSubmit}
+            disabled={!isFormValid || createPost.isPending}
+            className={`items-center rounded-full py-4 ${
+              isFormValid ? 'bg-primary' : 'bg-primary/30'
+            }`}
+          >
+            <Text
+              className={`text-base font-semibold ${
+                isFormValid ? 'text-white' : 'text-white/60'
+              }`}
+            >
+              {createPost.isPending ? '게시 중...' : '다음'}
+            </Text>
+          </Pressable>
+        </View>
       </SafeAreaView>
     </>
   );
