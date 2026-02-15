@@ -1,5 +1,6 @@
 export interface PostImage {
   _id: string;
+  id: string;
   url: string;
   thumbnail: string;
   order: number;
@@ -15,23 +16,28 @@ export interface PostImage {
   description?: string;
 }
 
+export interface PostAuthor {
+  _id: string;
+  email: string;
+}
+
 export interface Post {
   _id: string;
-  author: {
-    _id: string;
-    name: string;
-    profileImage?: string;
-  };
+  id: string;
+  author: PostAuthor | null;
   content: string;
   images: PostImage[];
   tags: string[];
   visibility: 'public' | 'private';
+  likes: string[];
   likeCount: number;
   commentCount: number;
-  isLiked?: boolean;
-  isBookmarked?: boolean;
+  viewCount: number;
+  isPublished: boolean;
   createdAt: string;
   updatedAt: string;
+  publishedAt: string;
+  __v: number;
 }
 
 export interface PostCreatePayload {
@@ -56,14 +62,9 @@ export interface ImageMeta {
 }
 
 export interface PostListResponse {
-  pagination: Pagination;
-  count: number;
+  success: boolean;
   data: Post[];
-}
-
-export interface Pagination {
-  page: number;
-  pageSize: number;
-  total: number;
   totalPages: number;
+  currentPage: string;
+  total: number;
 }

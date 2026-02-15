@@ -9,8 +9,8 @@ export function usePosts(pageSize = 20) {
     queryKey: POSTS_KEY,
     queryFn: ({ pageParam = 1 }) => postsApi.getList(pageParam, pageSize),
     getNextPageParam: (lastPage) => {
-      const { page, totalPages } = lastPage.pagination;
-      return page < totalPages ? page + 1 : undefined;
+      const currentPage = Number(lastPage.currentPage);
+      return currentPage < lastPage.totalPages ? currentPage + 1 : undefined;
     },
     initialPageParam: 1,
   });

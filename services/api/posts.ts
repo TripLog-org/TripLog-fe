@@ -7,6 +7,9 @@ export const postsApi = {
     const { data } = await apiClient.get<PostListResponse>('/api/posts', {
       params: { page, pageSize },
     });
+
+    console.log('GET Posts', data);
+
     return data;
   },
 
