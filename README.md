@@ -14,7 +14,7 @@ Figma 디자인과 TripLog-be API를 기준으로 시작합니다.
 - 스타일링: `nativewind`
 - 지도 SDK: Google Maps
 
-## 2. 아키텍처(추천)
+## 2. 아키텍처
 
 ### 2.1 구조
 
@@ -238,8 +238,8 @@ TripLog-fe/
 API_BASE_URL=http://192.168.45.41:3000
 
 # Google Maps
-IOS_GOOGLE_MAPS_API_KEY=AIzaSyCNgVKX2qmfOBRbViMwGi6YWWq2UaYIqfQ
-ANDROID_GOOGLE_MAPS_API_KEY=AIzaSyBqW8rc3YW248Pvb40acdFDzuFK9WNQB8s
+IOS_GOOGLE_MAPS_API_KEY=secret
+ANDROID_GOOGLE_MAPS_API_KEY=secret
 ```
 
 ## 9. 정책/요구사항
