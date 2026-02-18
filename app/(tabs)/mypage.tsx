@@ -1,78 +1,117 @@
-import { View, Text, Pressable, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMemo } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  ScrollView,
+  useWindowDimensions,
+} from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/features/auth/useAuthStore';
+import { usePosts } from '@/features/posts/usePosts';
+import { appConfig } from '@/shared/config';
 import { Ionicons } from '@expo/vector-icons';
 
+const GRID_GAP = 2;
+const COLUMNS = 3;
+
 export default function MyPageScreen() {
-  const { user, logout, withdraw } = useAuthStore();
+  const router = useRouter();
+  const { user } = useAuthStore();
+  const { data } = usePosts();
+  const { width } = useWindowDimensions();
 
-  const handleLogout = () => {
-    Alert.alert('로그아웃', '정말 로그아웃하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      { text: '로그아웃', onPress: logout, style: 'destructive' },
-    ]);
-  };
+  const imageSize = (width - GRID_GAP * (COLUMNS - 1)) / COLUMNS;
 
-  const handleWithdraw = () => {
-    Alert.alert(
-      '회원 탈퇴',
-      '탈퇴하면 모든 데이터가 삭제됩니다. 정말 탈퇴하시겠습니까?',
-      [
-        { text: '취소', style: 'cancel' },
-        { text: '탈퇴', onPress: withdraw, style: 'destructive' },
-      ],
-    );
-  };
+  const posts = data?.pages.flatMap((page) => page.data) ?? [];
 
-  return (
-    <SafeAreaView className="flex-1 bg-surface" edges={['bottom']}>
-      {/* 프로필 */}
-      <View className="items-center bg-white px-6 py-8">
-        <View className="h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-          <Ionicons name="person" size={40} color="#4A90D9" />
-        </View>
-        <Text className="mt-3 text-xl font-bold text-text">{user?.name ?? '사용자'}</Text>
-        <Text className="mt-1 text-sm text-text-secondary">{user?.email}</Text>
-      </View>
-
-      {/* 메뉴 */}
-      <View className="mt-4 bg-white">
-        <MenuItem icon="bookmark-outline" label="내 북마크" onPress={() => {}} />
-        <MenuItem icon="settings-outline" label="설정" onPress={() => {}} />
-        <MenuItem icon="information-circle-outline" label="앱 정보" onPress={() => {}} />
-      </View>
-
-      <View className="mt-4 bg-white">
-        <MenuItem icon="log-out-outline" label="로그아웃" onPress={handleLogout} destructive />
-        <MenuItem icon="trash-outline" label="회원 탈퇴" onPress={handleWithdraw} destructive />
-      </View>
-    </SafeAreaView>
+  const totalLikes = useMemo(
+    () => posts.reduce((sum, post) => sum + post.likeCount, 0),
+    [posts],
   );
-}
 
-function MenuItem({
-  icon,
-  label,
-  onPress,
-  destructive = false,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  onPress: () => void;
-  destructive?: boolean;
-}) {
+  const allImages = useMemo(
+    () =>
+      posts.flatMap((post) =>
+        post.images.map((img) => ({
+          postId: post._id,
+          uri: img.url.startsWith('http')
+            ? img.url
+            : `${appConfig.apiBaseUrl}${img.url}`,
+        })),
+      ),
+    [posts],
+  );
+
   return (
-    <Pressable
-      onPress={onPress}
-      className="flex-row items-center justify-between border-b border-border px-6 py-4"
-    >
-      <View className="flex-row items-center gap-3">
-        <Ionicons name={icon} size={22} color={destructive ? '#EF4444' : '#1A1A1A'} />
-        <Text className={`text-base ${destructive ? 'text-error' : 'text-text'}`}>
-          {label}
-        </Text>
+    <ScrollView className="flex-1 bg-white">
+      {/* ── 프로필 헤더 ── */}
+      <View className="flex-row items-center justify-between px-5 pb-4 pt-4">
+        <View className="flex-row items-center rounded-full border border-border px-3 py-1.5">
+          <Ionicons name="person-circle-outline" size={18} color="#1A1A1A" />
+          <Text className="ml-1.5 text-sm font-semibold text-text">
+            {user?.name ?? '사용자'} 님
+          </Text>
+        </View>
+
+        <Pressable
+          onPress={() => router.push('/settings/settings')}
+          className="flex-row items-center gap-1"
+        >
+          <Ionicons name="settings-outline" size={18} color="#6B7280" />
+          <Text className="text-sm text-text-secondary">설정</Text>
+        </Pressable>
       </View>
-      <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
-    </Pressable>
+
+      {/* ── 통계 + 여행 지도 보기 ── */}
+      <View className="flex-row items-center px-5 pb-4">
+        <View className="flex-row items-center gap-4">
+          <View className="flex-row items-center gap-1">
+            <Text className="text-sm text-text-secondary">게시물</Text>
+            <Text className="text-sm font-bold text-text">{posts.length}</Text>
+          </View>
+          <View className="flex-row items-center gap-1">
+            <Text className="text-sm text-text-secondary">좋아요</Text>
+            <Text className="text-sm font-bold text-text">{totalLikes}</Text>
+          </View>
+        </View>
+
+        <View className="flex-1" />
+
+        <Pressable
+          onPress={() => router.push('/(tabs)/map')}
+          className="rounded-full border border-primary px-4 py-1.5"
+        >
+          <Text className="text-sm font-semibold text-primary">여행 지도 보기</Text>
+        </Pressable>
+      </View>
+
+      {/* ── 사진 그리드 / 빈 상태 ── */}
+      {allImages.length > 0 ? (
+        <View
+          className="flex-row flex-wrap"
+          style={{ gap: GRID_GAP }}
+        >
+          {allImages.map((img, index) => (
+            <Pressable
+              key={`${img.postId}-${index}`}
+              onPress={() => router.push(`/post/${img.postId}`)}
+            >
+              <Image
+                source={{ uri: img.uri }}
+                style={{ width: imageSize, height: imageSize }}
+                resizeMode="cover"
+              />
+            </Pressable>
+          ))}
+        </View>
+      ) : (
+        <View className="flex-1 items-center justify-center py-48">
+          <Ionicons name="images-outline" size={64} color="#D1D5DB" />
+          <Text className="mt-4 text-base text-text-tertiary">게시물이 없어요.</Text>
+        </View>
+      )}
+    </ScrollView>
   );
 }

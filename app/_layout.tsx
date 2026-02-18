@@ -1,7 +1,7 @@
 import '../global.css';
 
 import { useEffect } from 'react';
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/useAuthStore';
@@ -47,7 +47,7 @@ function RootLayoutNav() {
   return (
     <>
       <StatusBar style="dark" />
-      <Slot />
+      <Stack screenOptions={{ headerShown: false }} />
     </>
   );
 }

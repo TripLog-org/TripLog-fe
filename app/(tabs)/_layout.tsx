@@ -12,9 +12,15 @@ export default function TabsLayout() {
         },
         headerStyle: {
           backgroundColor: '#FFFFFF',
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
         },
+        headerTitleAlign: 'left',
         headerTitleStyle: {
-          fontWeight: '600',
+          fontWeight: '700',
+          fontSize: 20,
+          color: '#1A1A1A',
         },
       }}
     >
