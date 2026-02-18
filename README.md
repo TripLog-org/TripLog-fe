@@ -1,7 +1,6 @@
 # TripLog-fe
 
 React Native(Expo) 기반 TripLog 프론트엔드 프로젝트의 초기 설계 문서입니다.  
-Figma 디자인과 TripLog-be API를 기준으로 시작합니다.
 
 ## 1. 프로젝트 개요
 
