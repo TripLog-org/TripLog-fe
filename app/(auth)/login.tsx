@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Platform, Alert } from 'react-native';
+import { View, Text, Pressable, Platform, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuthStore } from '@/features/auth/useAuthStore';
@@ -54,6 +54,7 @@ export default function LoginScreen() {
               onPress={handleAppleLogin}
               className="h-14 flex-row items-center justify-center rounded-xl bg-black"
             >
+              <Image source={require('@/assets/apple.png')} className="w-4 h-5 mr-3" />
               <Text className="text-base font-semibold text-white">
                  Apple로 계속하기
               </Text>
@@ -65,8 +66,9 @@ export default function LoginScreen() {
             onPress={handleGoogleLogin}
             className="h-14 flex-row items-center justify-center rounded-xl border border-border bg-white"
           >
+            <Image source={require('@/assets/google.png')} className="w-5 h-5 mr-3" />
             <Text className="text-base font-semibold text-text">
-              G  Google로 계속하기
+              Google로 계속하기
             </Text>
           </Pressable>
         </View>
