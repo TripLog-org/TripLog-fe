@@ -28,6 +28,27 @@ const CATEGORIES = [
 
 const SORT_OPTIONS = ['제목순', '수정일순', '생성일순'] as const;
 type SortOption = (typeof SORT_OPTIONS)[number];
+const REGIONS = [
+  '--',
+  '서울',
+  '인천',
+  '대전',
+  '대구',
+  '광주',
+  '부산',
+  '울산',
+  '세종',
+  '경기',
+  '강원',
+  '충북',
+  '충남',
+  '전북',
+  '전남',
+  '경북',
+  '경남',
+  '제주',
+] as const;
+type RegionOption = (typeof REGIONS)[number];
 
 const CARD_GAP = 12;
 const HORIZONTAL_PADDING = 20;
@@ -36,10 +57,15 @@ export default function RecommendScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const [selectedCategory, setSelectedCategory] = useState('관광지');
+  const [selectedRegion, setSelectedRegion] = useState<RegionOption>('--');
+  const [showRegionMenu, setShowRegionMenu] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('제목순');
   const [showSortMenu, setShowSortMenu] = useState(false);
 
-  const params = { category: selectedCategory };
+  const params = {
+    category: selectedCategory,
+    ...(selectedRegion !== '--' ? { region: selectedRegion } : {}),
+  };
   const { data, isLoading, fetchNextPage, hasNextPage } = useRecommendations(params);
   const toggleBookmark = useToggleBookmark();
 
@@ -89,19 +115,56 @@ export default function RecommendScreen() {
     <View>
       {/* ── 지역 선택 + 정렬 ── */}
       <View className="flex-row items-center justify-between pb-3">
-        <Pressable className="flex-row items-center rounded-full border border-border bg-white px-3 py-1.5">
+        <Pressable
+          onPress={() => {
+            setShowRegionMenu((prev) => !prev);
+            setShowSortMenu(false);
+          }}
+          className="flex-row items-center rounded-full border border-border bg-white px-3 py-1.5"
+        >
           <Ionicons name="location" size={14} color="#4A90D9" />
-          <Text className="ml-1 text-sm text-text">지역 선택</Text>
+          <Text className="ml-1 text-sm text-text">
+            {selectedRegion === '--' ? '지역 선택' : selectedRegion}
+          </Text>
         </Pressable>
 
         <Pressable
-          onPress={() => setShowSortMenu(!showSortMenu)}
+          onPress={() => {
+            setShowSortMenu((prev) => !prev);
+            setShowRegionMenu(false);
+          }}
           className="flex-row items-center gap-1"
         >
           <Ionicons name="filter-outline" size={16} color="#6B7280" />
           <Text className="text-sm text-text-secondary">{sortBy}</Text>
         </Pressable>
       </View>
+
+      {/* 지역 선택 드롭다운 */}
+      {showRegionMenu && (
+        <View className="absolute left-0 top-10 z-20 max-h-64 w-40 rounded-lg border border-border bg-white shadow-md">
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {REGIONS.map((region) => (
+              <Pressable
+                key={region}
+                onPress={() => {
+                  setSelectedRegion(region);
+                  setShowRegionMenu(false);
+                }}
+                className="border-b border-border px-3 py-2.5 last:border-b-0"
+              >
+                <Text
+                  className={`text-sm ${
+                    selectedRegion === region ? 'font-semibold text-primary' : 'text-text'
+                  }`}
+                >
+                  {region}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
       {/* 정렬 옵션 드롭다운 */}
       {showSortMenu && (

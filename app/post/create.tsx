@@ -73,12 +73,7 @@ export default function PostCreateScreen() {
     setTags((prev) => prev.filter((t) => t !== tag));
   };
 
-  const handleSubmit = async () => {
-    if (!content.trim()) {
-      Alert.alert('안내', '내용을 입력해주세요.');
-      return;
-    }
-
+  const handleNext = async () => {
     const formData = new FormData();
     formData.append('content', content.trim());
 
@@ -217,7 +212,7 @@ export default function PostCreateScreen() {
         {/* ── 하단 다음 버튼 ── */}
         <View className="px-5 pb-4 pt-2">
           <Pressable
-            onPress={handleSubmit}
+            onPress={handleNext}
             disabled={!isFormValid || createPost.isPending}
             className={`items-center rounded-full py-4 ${
               isFormValid ? 'bg-primary' : 'bg-primary/30'

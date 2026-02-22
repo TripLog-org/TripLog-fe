@@ -6,7 +6,6 @@ export default function RecommendLayout() {
   return (
     <Stack
       screenOptions={{
-        headerTitle: '설정',
         headerTitleAlign: 'center',
         headerLeft: () => (
           <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -16,6 +15,19 @@ export default function RecommendLayout() {
         headerStyle: { backgroundColor: '#FFFFFF' },
         headerTitleStyle: { fontWeight: '600' },
       }}
-    />
+    >
+      <Stack.Screen
+        name="myMap"
+        options={{
+          headerTitle: '나의 여행 지도',
+        }}
+      />
+      <Stack.Screen
+        name="settings"
+        options={{
+          headerTitle: '설정',
+        }}
+      />
+    </Stack>
   );
 }

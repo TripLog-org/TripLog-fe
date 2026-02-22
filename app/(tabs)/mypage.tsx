@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -18,9 +18,15 @@ const COLUMNS = 3;
 
 export default function MyPageScreen() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { data } = usePosts();
   const { width } = useWindowDimensions();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/(auth)/login');
+    }
+  }, [isAuthenticated, router]);
 
   const imageSize = (width - GRID_GAP * (COLUMNS - 1)) / COLUMNS;
 
@@ -56,7 +62,7 @@ export default function MyPageScreen() {
         </View>
 
         <Pressable
-          onPress={() => router.push('/settings/settings')}
+          onPress={() => router.push('/mypage/settings')}
           className="flex-row items-center gap-1"
         >
           <Ionicons name="settings-outline" size={18} color="#6B7280" />
@@ -80,7 +86,7 @@ export default function MyPageScreen() {
         <View className="flex-1" />
 
         <Pressable
-          onPress={() => router.push('/(tabs)/map')}
+          onPress={() => router.push('/mypage/myMap')}
           className="rounded-full border border-primary px-4 py-1.5"
         >
           <Text className="text-sm font-semibold text-primary">여행 지도 보기</Text>

@@ -14,7 +14,7 @@ const INITIAL_REGION = {
   longitudeDelta: 5,
 };
 
-export default function MapScreen() {
+export default function MyMapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { data, isLoading } = usePosts();
@@ -57,43 +57,11 @@ export default function MapScreen() {
         })}
       </MapView>
 
-      {/* 검색 바 + 여행 추가 버튼 오버레이 */}
-      <View
-        className="absolute left-0 right-0 flex-row items-center px-3 gap-2"
-        style={{ top: insets.top + 4 }}
-      >
-        {/* 해시태그 검색 */}
-        <View className="flex-1 flex-row items-center rounded-full bg-white px-4 py-2.5 shadow-sm">
-          <Ionicons name="search" size={18} color="#9CA3AF" />
-          <TextInput
-            className="ml-2 flex-1 text-sm text-text"
-            placeholder="해시태그 검색"
-            placeholderTextColor="#9CA3AF"
-            value={searchText}
-            onChangeText={setSearchText}
-            returnKeyType="search"
-          />
-          {searchText.length > 0 && (
-            <Pressable onPress={() => setSearchText('')} hitSlop={8}>
-              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
-            </Pressable>
-          )}
-        </View>
-
-        {/* 여행 추가 하기 */}
-        <Pressable
-          onPress={() => router.push('/post/create')}
-          className="flex-row items-center rounded-full bg-primary px-4 py-3 shadow-sm"
-        >
-          <Text className="text-sm font-semibold text-white">여행 추가 하기</Text>
-        </Pressable>
-      </View>
-
       {/* 북마크 버튼 */}
       <Pressable
         onPress={() => {}}
         className="absolute right-3 h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm"
-        style={{ bottom: insets.bottom + 36 }}
+        style={{ bottom: insets.bottom + 72 }}
       >
         <Ionicons name="bookmark-outline" size={20} color="#555555" />
       </Pressable>

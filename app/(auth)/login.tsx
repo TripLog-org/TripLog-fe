@@ -2,6 +2,7 @@ import { View, Text, Pressable, Platform, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuthStore } from '@/features/auth/useAuthStore';
+import { Stack } from 'expo-router';
 
 export default function LoginScreen() {
   const { loginWithApple, loginWithGoogle } = useAuthStore();
