@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { useCreatePost } from '@/features/posts/usePosts';
+import { useCreatePostStore, ImageWithMeta } from '@/features/posts/useCreatePostStore';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -20,11 +20,12 @@ interface SelectedImage {
   uri: string;
   type: string;
   fileName: string;
+  exif?: Record<string, unknown> | null;
 }
 
 export default function PostCreateScreen() {
   const router = useRouter();
-  const createPost = useCreatePost();
+  const store = useCreatePostStore();
 
   const [content, setContent] = useState('');
   const [images, setImages] = useState<SelectedImage[]>([]);
@@ -45,6 +46,7 @@ export default function PostCreateScreen() {
       allowsMultipleSelection: true,
       selectionLimit: remaining,
       quality: 0.8,
+      exif: true,
     });
 
     if (!result.canceled) {
@@ -52,6 +54,7 @@ export default function PostCreateScreen() {
         uri: asset.uri,
         type: asset.mimeType ?? 'image/jpeg',
         fileName: asset.fileName ?? `photo_${Date.now()}.jpg`,
+        exif: asset.exif,
       }));
       setImages((prev) => [...prev, ...newImages]);
     }
@@ -73,30 +76,32 @@ export default function PostCreateScreen() {
     setTags((prev) => prev.filter((t) => t !== tag));
   };
 
-  const handleNext = async () => {
-    const formData = new FormData();
-    formData.append('content', content.trim());
+  const handleNext = () => {
+    const imagesWithMeta: ImageWithMeta[] = images.map((img) => {
+      const exif = img.exif as Record<string, unknown> | undefined;
+      const gps = exif?.GPSLatitude
+        ? {
+            latitude: Number(exif.GPSLatitude),
+            longitude: Number(exif.GPSLongitude),
+          }
+        : undefined;
+      const dateStr =
+        (exif?.DateTimeOriginal as string) ?? (exif?.DateTime as string);
 
-    if (tags.length > 0) {
-      formData.append('tags', tags.join(','));
-    }
-
-    images.forEach((img) => {
-      formData.append('images', {
+      return {
         uri: img.uri,
         type: img.type,
-        name: img.fileName,
-      } as unknown as Blob);
+        fileName: img.fileName,
+        latitude: gps?.latitude,
+        longitude: gps?.longitude,
+        capturedAt: dateStr ?? undefined,
+      };
     });
 
-    createPost.mutate(formData, {
-      onSuccess: () => {
-        router.back();
-      },
-      onError: () => {
-        Alert.alert('오류', '게시물 작성에 실패했습니다.');
-      },
-    });
+    store.setContent(content.trim());
+    store.setTags(tags);
+    store.setImages(imagesWithMeta);
+    router.push('/post/metadata');
   };
 
   return (
@@ -185,9 +190,9 @@ export default function PostCreateScreen() {
             </View>
             <Pressable
               onPress={addTag}
-              className="rounded-xl px-4 py-2.5 bg-primary"
+              className="rounded-xl px-4 py-2.5 bg-white border border-primary"
             >
-              <Text className="text-sm font-semibold text-white">추가</Text>
+              <Text className="text-sm font-semibold text-primary">추가</Text>
             </Pressable>
           </View>
 
@@ -213,7 +218,7 @@ export default function PostCreateScreen() {
         <View className="px-5 pb-4 pt-2">
           <Pressable
             onPress={handleNext}
-            disabled={!isFormValid || createPost.isPending}
+            disabled={!isFormValid}
             className={`items-center rounded-full py-4 ${
               isFormValid ? 'bg-primary' : 'bg-primary/30'
             }`}
@@ -223,7 +228,7 @@ export default function PostCreateScreen() {
                 isFormValid ? 'text-white' : 'text-white/60'
               }`}
             >
-              {createPost.isPending ? '게시 중...' : '다음'}
+              다음
             </Text>
           </Pressable>
         </View>

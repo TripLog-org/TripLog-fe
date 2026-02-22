@@ -59,6 +59,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         iosUrlScheme: 'com.googleusercontent.apps.YOUR_IOS_CLIENT_ID',
       },
     ],
+    '@react-native-community/datetimepicker',
   ],
   extra: {
     apiBaseUrl: process.env.API_BASE_URL,
