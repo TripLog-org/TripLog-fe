@@ -8,6 +8,7 @@ import { timeAgo } from '@/shared/utils/formatDate';
 import { useAuthStore } from '@/features/auth/useAuthStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -20,7 +21,7 @@ export default function PostDetailScreen() {
   const createComment = useCreateComment(id);
   const [commentText, setCommentText] = useState('');
 
-  const isAuthor = post?.author?._id === user?.id;
+  const isAuthor = user && user.id === post?.author?._id;
 
   const handleDelete = () => {
     Alert.alert('게시물 삭제', '정말 삭제하시겠습니까?', [
@@ -79,7 +80,7 @@ export default function PostDetailScreen() {
         }}
       />
 
-      <View className="flex-1 bg-white">
+      <SafeAreaView className="flex-1 bg-white" edges={['bottom']}>
         <ScrollView className="flex-1">
           {/* 이미지 갤러리 */}
           {post.images.length > 0 && (
@@ -105,7 +106,7 @@ export default function PostDetailScreen() {
               <View className="h-8 w-8 items-center justify-center rounded-full bg-primary/10">
                 <Ionicons name="person" size={16} color="#4A90D9" />
               </View>
-              <Text className="text-sm font-semibold text-text">{post.author?.email}</Text>
+              <Text className="text-sm font-semibold text-text">{post.author?.email?.split('@')[0]}</Text>
               <Text className="text-xs text-text-tertiary">{timeAgo(post.createdAt)}</Text>
             </View>
 
@@ -122,8 +123,13 @@ export default function PostDetailScreen() {
               </View>
             )}
 
-            {/* 좋아요 / 북마크 */}
+            {/* 조회수 / 좋아요 / 댓글 / 북마크 */}
             <View className="mt-4 flex-row items-center gap-4 border-t border-border pt-3">
+              <View className="flex-row items-center gap-1">
+                <Ionicons name="eye-outline" size={20} color="#9CA3AF" />
+                <Text className="text-sm text-text-secondary">{post.viewCount}</Text>
+              </View>
+
               <Pressable
                 onPress={() => toggleLike.mutate(id)}
                 className="flex-row items-center gap-1"
@@ -164,7 +170,7 @@ export default function PostDetailScreen() {
                 <View className="flex-1">
                   <View className="flex-row items-center gap-2">
                     <Text className="text-xs font-semibold text-text">
-                      {comment.author.name}
+                      {comment.author?.email?.split('@')[0] ?? 'Unknown User'}
                     </Text>
                     <Text className="text-xs text-text-tertiary">
                       {timeAgo(comment.createdAt)}
@@ -190,7 +196,7 @@ export default function PostDetailScreen() {
             <Ionicons name="send" size={24} color="#4A90D9" />
           </Pressable>
         </View>
-      </View>
+      </SafeAreaView>
     </>
   );
 }

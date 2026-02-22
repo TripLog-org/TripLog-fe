@@ -2,8 +2,7 @@ export interface Comment {
   _id: string;
   author: {
     _id: string;
-    name: string;
-    profileImage?: string;
+    email: string;
   };
   content: string;
   likeCount: number;

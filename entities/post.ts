@@ -29,7 +29,6 @@ export interface Post {
   images: PostImage[];
   tags: string[];
   visibility: 'public' | 'private';
-  likes: string[];
   likeCount: number;
   commentCount: number;
   viewCount: number;
@@ -38,6 +37,8 @@ export interface Post {
   updatedAt: string;
   publishedAt: string;
   __v: number;
+  isLiked: boolean;
+  isBookmarked: boolean;
 }
 
 export interface PostCreatePayload {
