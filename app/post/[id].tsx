@@ -20,7 +20,7 @@ export default function PostDetailScreen() {
   const createComment = useCreateComment(id);
   const [commentText, setCommentText] = useState('');
 
-  const isAuthor = post?.author._id === user?.id;
+  const isAuthor = post?.author?._id === user?.id;
 
   const handleDelete = () => {
     Alert.alert('게시물 삭제', '정말 삭제하시겠습니까?', [
@@ -56,6 +56,11 @@ export default function PostDetailScreen() {
       <Stack.Screen
         options={{
           title: '',
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} hitSlop={8}>
+              <Ionicons name="chevron-back" size={24} color="#1A1A1A" />
+            </Pressable>
+          ),
           headerRight: () =>
             isAuthor ? (
               <View className="flex-row gap-4">
@@ -100,7 +105,7 @@ export default function PostDetailScreen() {
               <View className="h-8 w-8 items-center justify-center rounded-full bg-primary/10">
                 <Ionicons name="person" size={16} color="#4A90D9" />
               </View>
-              <Text className="text-sm font-semibold text-text">{post.author.name}</Text>
+              <Text className="text-sm font-semibold text-text">{post.author?.email}</Text>
               <Text className="text-xs text-text-tertiary">{timeAgo(post.createdAt)}</Text>
             </View>
 

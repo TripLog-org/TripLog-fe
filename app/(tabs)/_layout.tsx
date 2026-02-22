@@ -38,6 +38,7 @@ export default function TabsLayout() {
         name="album"
         options={{
           title: '여행 앨범',
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="images-outline" size={size} color={color} />
           ),
