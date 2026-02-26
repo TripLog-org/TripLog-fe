@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { data: post, isLoading } = usePostDetail(id);
   const toggleLike = useTogglePostLike();
   const deletePost = useDeletePost();
@@ -37,17 +37,33 @@ export default function PostDetailScreen() {
   };
 
   const handleReport = () => {
-    Alert.alert('신고', '이 게시물을 신고하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      { text: '신고', onPress: () => Alert.alert('완료', '신고가 접수되었습니다.') },
-    ]);
+    if (!isAuthenticated) {
+      Alert.alert('안내', '로그인 후 이용해주세요.', [
+        { text: '취소', style: 'cancel' },
+        { text: '로그인', onPress: () => router.replace('/(auth)/login') },
+      ]);
+      return;
+    } else {
+      Alert.alert('신고', '이 게시물을 신고하시겠습니까?', [
+        { text: '취소', style: 'cancel' },
+        { text: '신고', onPress: () => Alert.alert('완료', '신고가 접수되었습니다.') },
+      ]);
+    }
   };
 
   const handleSubmitComment = () => {
-    if (!commentText.trim()) return;
-    createComment.mutate(commentText.trim(), {
-      onSuccess: () => setCommentText(''),
-    });
+    if (!isAuthenticated) {
+      Alert.alert('안내', '로그인 후 이용해주세요.', [
+        { text: '취소', style: 'cancel' },
+        { text: '로그인', onPress: () => router.replace('/(auth)/login') },
+      ]);
+      return;
+    } else {
+      if (!commentText.trim()) return;
+      createComment.mutate(commentText.trim(), {
+        onSuccess: () => setCommentText(''),
+      });
+    }
   };
 
   if (isLoading || !post) return <LoadingSpinner />;
