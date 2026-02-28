@@ -1,5 +1,6 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { postsApi } from '@/services/api/posts';
+import { MapPostsParams } from '@/entities/post';
 
 const POSTS_KEY = ['posts'];
 
@@ -47,6 +48,15 @@ export function useDeletePost() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: POSTS_KEY });
     },
+  });
+}
+
+/** 지도 마커용 게시물 조회 */
+export function useMapPosts(params: MapPostsParams) {
+  return useQuery({
+    queryKey: ['mapPosts', params],
+    queryFn: () => postsApi.getMapPosts(params),
+    enabled: params.latitude !== 0 && params.longitude !== 0,
   });
 }
 

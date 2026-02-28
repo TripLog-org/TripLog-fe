@@ -1,4 +1,4 @@
-import { Post, PostListResponse } from '@/entities/post';
+import { Post, PostListResponse, MapPostsResponse, MapPostsParams } from '@/entities/post';
 import { apiClient } from './client';
 
 export const postsApi = {
@@ -36,6 +36,14 @@ export const postsApi = {
   /** 게시물 삭제 */
   async remove(postId: string): Promise<void> {
     await apiClient.delete(`/api/posts/${postId}`);
+  },
+
+  /** 지도 마커용 게시물 조회 */
+  async getMapPosts(params: MapPostsParams): Promise<MapPostsResponse> {
+    const { data } = await apiClient.get<MapPostsResponse>('/api/posts/map', {
+      params,
+    });
+    return data;
   },
 
   /** 게시물 좋아요 토글 */

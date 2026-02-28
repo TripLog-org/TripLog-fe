@@ -15,7 +15,8 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   const token = await tokenManager.getAccessToken();
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    // config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTg1ZWUzNmMzYjM5MmM2MGQ1OTRkM2EiLCJpYXQiOjE3NzIyNTA2NzAsImV4cCI6MTc3Mjg1NTQ3MH0.px0MMiOfrwX23YNKp27YbvvTNDuIoLTCXoo8AC-TM9A";
   }
   return config;
 });

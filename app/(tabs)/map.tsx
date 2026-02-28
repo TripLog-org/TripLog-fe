@@ -1,36 +1,51 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Pressable } from 'react-native';
+import { useState, useCallback, useRef } from 'react';
+import { View, Text, TextInput, Pressable, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { usePosts } from '@/features/posts/usePosts';
-import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
+import { useMapPosts } from '@/features/posts/usePosts';
+import { appConfig } from '@/shared/config';
 import { Ionicons } from '@expo/vector-icons';
 
-const INITIAL_REGION = {
+const INITIAL_REGION: Region = {
   latitude: 37.5665,
   longitude: 126.978,
   latitudeDelta: 5,
   longitudeDelta: 5,
 };
 
+const MARKER_SIZE = 48;
+
+function deltaToZoom(latDelta: number): number {
+  return Math.round(Math.log2(360 / latDelta));
+}
+
+function toAbsoluteUrl(url: string) {
+  if (url.startsWith('https')) return url;
+  return `${appConfig.apiBaseUrl}${url}`;
+}
+
 export default function MapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { data, isLoading } = usePosts();
   const [searchText, setSearchText] = useState('');
+  const [region, setRegion] = useState<Region>(INITIAL_REGION);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const posts = data?.pages.flatMap((page) => page.data) ?? [];
+  const mapParams = {
+    latitude: region.latitude,
+    longitude: region.longitude,
+    zoomLevel: deltaToZoom(region.latitudeDelta),
+    ...(searchText.trim() ? { tag: searchText.trim() } : {}),
+  };
 
-  // 위치 정보가 있는 게시물만 마커로 표시
-  const markers = posts.filter((post) => {
-    const coords = post.images?.[0]?.location?.coordinates;
-    return coords?.latitude && coords?.longitude;
-  });
+  const { data } = useMapPosts(mapParams);
+  const markers = data?.data ?? [];
 
-  console.log('markers', markers);
-
-  if (isLoading) return <LoadingSpinner />;
+  const handleRegionChange = useCallback((newRegion: Region) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setRegion(newRegion), 400);
+  }, []);
 
   return (
     <View className="flex-1">
@@ -38,23 +53,30 @@ export default function MapScreen() {
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
         initialRegion={INITIAL_REGION}
+        onRegionChangeComplete={handleRegionChange}
         showsUserLocation
         showsMyLocationButton
       >
-        {markers.map((post) => {
-          const coords = post.images[0].location!.coordinates!;
-          return (
-            <Marker
-              key={post._id}
-              coordinate={{
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-              }}
-              title={post.content.slice(0, 30)}
-              onCalloutPress={() => router.push(`/post/${post._id}`)}
-            />
-          );
-        })}
+        {markers.map((item, index) => (
+          <Marker
+            key={`${item.postId}-${index}`}
+            coordinate={{
+              latitude: item.photo.location.coordinates.latitude,
+              longitude: item.photo.location.coordinates.longitude,
+            }}
+            onPress={() => router.push(`/post/${item.postId}`)}
+          >
+            <View
+              style={{ width: MARKER_SIZE, height: MARKER_SIZE, borderRadius: MARKER_SIZE, overflow: 'hidden', borderWidth: 2, borderColor: '#fff' }}
+            >
+              <Image
+                source={{ uri: toAbsoluteUrl(item.photo.thumbnail) }}
+                style={{ width: '100%', height: '100%' }}
+                resizeMode="cover"
+              />
+            </View>
+          </Marker>
+        ))}
       </MapView>
 
       {/* 검색 바 + 여행 추가 버튼 오버레이 */}

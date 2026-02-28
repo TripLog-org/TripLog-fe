@@ -62,6 +62,48 @@ export interface ImageMeta {
   description?: string;
 }
 
+/* ── 지도 마커용 ── */
+
+export interface MapPhoto {
+  url: string;
+  thumbnail: string;
+  location: {
+    name?: string;
+    coordinates: {
+      latitude: number;
+      longitude: number;
+    };
+    address?: string;
+  };
+  capturedAt?: string;
+  description?: string;
+}
+
+export interface MapPost {
+  postId: string;
+  photo: MapPhoto;
+  author: {
+    _id: string;
+    username: string;
+    profileImage?: string;
+  } | null;
+  createdAt: string;
+}
+
+export interface MapPostsResponse {
+  success: boolean;
+  data: MapPost[];
+  total: number;
+}
+
+export interface MapPostsParams {
+  latitude: number;
+  longitude: number;
+  zoomLevel: number;
+  tag?: string;
+  limit?: number;
+}
+
 export interface PostListResponse {
   success: boolean;
   data: Post[];
