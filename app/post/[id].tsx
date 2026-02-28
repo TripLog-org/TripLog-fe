@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Pressable, Alert, FlatList, TextInput } from 'react-native';
+import { View, Text, ScrollView, Image, Pressable, Alert, FlatList, TextInput, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { usePostDetail } from '@/features/posts/usePostDetail';
 import { useTogglePostLike, useDeletePost } from '@/features/posts/usePosts';
@@ -9,6 +9,8 @@ import { useAuthStore } from '@/features/auth/useAuthStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { appConfig } from '@/shared/config';
+import { useToggleBookmark } from '@/features/recommend/useBookmarks';
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,11 +19,25 @@ export default function PostDetailScreen() {
   const { data: post, isLoading } = usePostDetail(id);
   const toggleLike = useTogglePostLike();
   const deletePost = useDeletePost();
+  const toggleBookmark = useToggleBookmark();
   const { data: comments } = useComments(id);
   const createComment = useCreateComment(id);
   const [commentText, setCommentText] = useState('');
+  const { width } = useWindowDimensions();
 
   const isAuthor = user && user.id === post?.author?._id;
+
+  const handleBookmark = () => {
+    if (!isAuthenticated) {
+      Alert.alert('안내', '로그인 후 이용해주세요.', [
+        { text: '취소', style: 'cancel' },
+        { text: '로그인', onPress: () => router.replace('/(auth)/login') },
+      ]);
+      return;
+    } else {
+      toggleBookmark.mutate(id);
+    }
+  };
 
   const handleDelete = () => {
     Alert.alert('게시물 삭제', '정말 삭제하시겠습니까?', [
@@ -81,6 +97,13 @@ export default function PostDetailScreen() {
           headerRight: () =>
             isAuthor ? (
               <View className="flex-row gap-4">
+                <Pressable onPress={handleBookmark}>
+                  <Ionicons
+                    name={post.isBookmarked ? 'bookmark' : 'bookmark-outline'}
+                    size={22}
+                    color={post.isBookmarked ? '#4A90D9' : '#9CA3AF'}
+                  />
+                </Pressable>
                 <Pressable onPress={() => router.push(`/post/edit/${id}`)}>
                   <Ionicons name="create-outline" size={22} color="#1A1A1A" />
                 </Pressable>
@@ -89,9 +112,18 @@ export default function PostDetailScreen() {
                 </Pressable>
               </View>
             ) : (
-              <Pressable onPress={handleReport}>
-                <Ionicons name="flag-outline" size={22} color="#9CA3AF" />
-              </Pressable>
+              <View className="flex-row gap-4">
+                <Pressable onPress={handleBookmark}>
+                  <Ionicons
+                    name={post.isBookmarked ? 'bookmark' : 'bookmark-outline'}
+                    size={22}
+                    color={post.isBookmarked ? '#4A90D9' : '#9CA3AF'}
+                  />
+                </Pressable>
+                <Pressable onPress={handleReport}>
+                  <Ionicons name="flag-outline" size={22} color="#9CA3AF" />
+                </Pressable>
+              </View>
             ),
         }}
       />
@@ -108,8 +140,8 @@ export default function PostDetailScreen() {
               keyExtractor={(item) => item._id}
               renderItem={({ item }) => (
                 <Image
-                  source={{ uri: item.url }}
-                  style={{ width: 400, height: 300 }}
+                  source={{ uri: appConfig.apiBaseUrl + item.url }}
+                  style={{ width: width, height: width }}
                   resizeMode="cover"
                 />
               )}
@@ -139,7 +171,7 @@ export default function PostDetailScreen() {
               </View>
             )}
 
-            {/* 조회수 / 좋아요 / 댓글 / 북마크 */}
+            {/* 조회수 / 좋아요 / 댓글 */}
             <View className="mt-4 flex-row items-center gap-4 border-t border-border pt-3">
               <View className="flex-row items-center gap-1">
                 <Ionicons name="eye-outline" size={20} color="#9CA3AF" />
@@ -162,14 +194,6 @@ export default function PostDetailScreen() {
                 <Ionicons name="chatbubble-outline" size={20} color="#9CA3AF" />
                 <Text className="text-sm text-text-secondary">{post.commentCount}</Text>
               </View>
-
-              <Pressable className="flex-row items-center gap-1">
-                <Ionicons
-                  name={post.isBookmarked ? 'bookmark' : 'bookmark-outline'}
-                  size={20}
-                  color={post.isBookmarked ? '#4A90D9' : '#9CA3AF'}
-                />
-              </Pressable>
             </View>
           </View>
 

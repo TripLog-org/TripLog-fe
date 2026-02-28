@@ -2,7 +2,6 @@ import { View, Text, Pressable, Platform, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuthStore } from '@/features/auth/useAuthStore';
-import { Stack } from 'expo-router';
 
 export default function LoginScreen() {
   const { loginWithApple, loginWithGoogle } = useAuthStore();
@@ -20,6 +19,7 @@ export default function LoginScreen() {
       }
     } catch (error: unknown) {
       const e = error as { code?: string };
+      console.log(e.code);
       if (e.code !== 'ERR_REQUEST_CANCELED') {
         Alert.alert('로그인 실패', '애플 로그인에 실패했습니다.');
       }

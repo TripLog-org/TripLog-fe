@@ -14,6 +14,7 @@ import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Post } from '@/entities/post';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { appConfig } from '@/shared/config';
 
 const NUM_COLUMNS = 3;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -38,8 +39,8 @@ export default function AlbumScreen() {
 
   console.log('posts', posts);
 
-  const renderItem = ({ item }: { item: Post }) => {
-    const thumbnail = item.images?.[0]?.thumbnail || item.images?.[0]?.url;
+  const renderItem = ({ item }: { item: Post }) => {  
+    const thumbnail = item.images?.[0]?.thumbnail
     return (
       <Pressable
         onPress={() => router.push(`/post/${item._id}`)}
@@ -48,7 +49,7 @@ export default function AlbumScreen() {
       >
         {thumbnail ? (
           <Image
-            source={{ uri: thumbnail }}
+            source={{ uri: appConfig.apiBaseUrl + thumbnail }}
             style={{ width: ITEM_SIZE, height: ITEM_SIZE }}
             resizeMode="cover"
           />
