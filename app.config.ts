@@ -62,7 +62,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     '@react-native-community/datetimepicker',
   ],
   extra: {
-    apiBaseUrl: process.env.API_BASE_URL,
+    apiBaseUrlDevelopment: process.env.API_BASE_URL_DEVELOPMENT,
+    apiBaseUrlProduction: process.env.API_BASE_URL_PRODUCTION,
     iosGoogleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY,
     androidGoogleMapsApiKey: process.env.ANDROID_GOOGLE_MAPS_API_KEY,
   },

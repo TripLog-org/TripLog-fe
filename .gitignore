@@ -8,6 +8,8 @@ web-build/
 
 # Native
 *.orig.*
+*.local.properties
+android/local.properties
 *.jks
 *.p8
 *.p12

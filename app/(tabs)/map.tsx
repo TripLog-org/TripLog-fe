@@ -22,7 +22,7 @@ function deltaToZoom(latDelta: number): number {
 
 function toAbsoluteUrl(url: string) {
   if (url.startsWith('https')) return url;
-  return `${appConfig.apiBaseUrl}${url}`;
+  return `${appConfig.apiBaseUrlProduction}${url}`;
 }
 
 export default function MapScreen() {

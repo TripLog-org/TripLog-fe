@@ -6,7 +6,7 @@ import { tokenManager } from '../auth/tokenManager';
 import { appConfig } from '../../shared/config';
 
 export const apiClient = axios.create({
-  baseURL: appConfig.apiBaseUrl,
+  baseURL: appConfig.apiBaseUrlProduction,
   timeout: 15_000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -63,7 +63,7 @@ apiClient.interceptors.response.use(
       const refreshToken = await tokenManager.getRefreshToken();
       if (!refreshToken) throw new Error('No refresh token');
 
-      const { data } = await axios.post(`${appConfig.apiBaseUrl}/api/auth/refresh`, {
+      const { data } = await axios.post(`${appConfig.apiBaseUrlProduction}/api/auth/refresh`, {
         refreshToken,
       });
 

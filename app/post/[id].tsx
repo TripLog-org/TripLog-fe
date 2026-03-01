@@ -140,7 +140,7 @@ export default function PostDetailScreen() {
               keyExtractor={(item) => item._id}
               renderItem={({ item }) => (
                 <Image
-                  source={{ uri: appConfig.apiBaseUrl + item.url }}
+                  source={{ uri: appConfig.apiBaseUrlProduction + item.url }}
                   style={{ width: width, height: width }}
                   resizeMode="cover"
                 />
