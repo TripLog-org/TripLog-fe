@@ -20,11 +20,12 @@ import { useCreatePostStore } from '@/features/posts/useCreatePostStore';
 import { useCreatePost } from '@/features/posts/usePosts';
 import * as Location from 'expo-location';
 import { useAuthStore } from '@/features/auth/useAuthStore';
+import { compressImage } from '@/shared/utils/compressImage';
 
 export default function MetadataScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const { images, content, tags, updateImageMeta, reset } =
+  const { images, content, tags, visibility, updateImageMeta, reset } =
     useCreatePostStore();
   const createPost = useCreatePost();
 
@@ -108,20 +109,27 @@ export default function MetadataScreen() {
     setShowDatePicker(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { isAuthenticated } = useAuthStore.getState();
 
-    if (isAuthenticated) {
+    if (!isAuthenticated) {
       Alert.alert('안내', '로그인 후 이용해주세요.', [
         { text: '취소', style: 'cancel' },
         { text: '로그인', onPress: () => router.replace('/(auth)/login') },
       ]);
       return;
-    } else {
+    }
+
+    try {
+      const compressedUris = await Promise.all(
+        images.map((img) => compressImage(img.uri)),
+      );
+
       const formData = new FormData();
       formData.append('content', content);
-      if (tags.length > 0) formData.append('tags', tags.join(','));
-  
+      formData.append('tags', tags.join(','));
+      formData.append('visibility', visibility);
+
       const imageMeta = images.map((img) => ({
         latitude: img.latitude,
         longitude: img.longitude,
@@ -129,15 +137,15 @@ export default function MetadataScreen() {
         capturedAt: img.capturedAt,
       }));
       formData.append('imageMeta', JSON.stringify(imageMeta));
-  
-      images.forEach((img) => {
+
+      compressedUris.forEach((uri, i) => {
         formData.append('images', {
-          uri: img.uri,
-          type: img.type,
-          name: img.fileName,
+          uri,
+          type: 'image/jpeg',
+          name: images[i].fileName.replace(/\.\w+$/, '.jpg'),
         } as unknown as Blob);
       });
-  
+
       createPost.mutate(formData, {
         onSuccess: () => {
           reset();
@@ -145,10 +153,12 @@ export default function MetadataScreen() {
           router.replace('/(tabs)/map');
         },
         onError: (error) => {
-          console.log(error)
+          console.log(error);
           Alert.alert('오류', '게시물 작성에 실패했습니다.');
         },
       });
+    } catch {
+      Alert.alert('오류', '이미지 압축에 실패했습니다.');
     }
   };
 

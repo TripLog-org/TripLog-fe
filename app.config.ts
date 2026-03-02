@@ -23,6 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       googleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY,
     },
     usesAppleSignIn: true,
+    googleServicesFile: './GoogleService-Info.plist',
   },
   android: {
     adaptiveIcon: {
@@ -44,6 +45,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-router',
     'expo-secure-store',
     'expo-apple-authentication',
+    '@react-native-google-signin/google-signin',
     [
       'expo-image-picker',
       {
@@ -52,7 +54,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         cameraPermission:
           '여행 사진을 촬영하기 위해 카메라 접근 권한이 필요합니다.',
       },
-    ],
+    ],  
     [
       '@react-native-google-signin/google-signin',
       {
@@ -64,5 +66,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     apiBaseUrlDevelopment: process.env.API_BASE_URL_DEVELOPMENT,
     apiBaseUrlProduction: process.env.API_BASE_URL_PRODUCTION,
+    googleWebClientId: process.env.GOOGLE_WEB_CLIENT_ID,
   },
 });

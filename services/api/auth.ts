@@ -1,5 +1,6 @@
 import { AuthResponse } from '@/entities/user';
 import { apiClient } from './client';
+import { tokenManager } from '../auth/tokenManager';
 
 export const authApi = {
   /** 애플 로그인 */
@@ -16,6 +17,15 @@ export const authApi = {
     const { data } = await apiClient.post<AuthResponse>('/api/auth/google', {
       idToken,
     });
+    return data;
+  },
+
+  /** 구글 로그인 - iOS */
+  async loginWithGoogleNative(idToken: string): Promise<AuthResponse> {
+    const { data } = await apiClient.post<AuthResponse>('/api/auth/google/native', {
+      idToken,
+    });
+    tokenManager.setTokens(data.accessToken, data.refreshToken);
     return data;
   },
 

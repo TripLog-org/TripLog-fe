@@ -18,6 +18,9 @@ interface AuthState {
   /** 구글 로그인 */
   loginWithGoogle: (idToken: string) => Promise<void>;
 
+  /** 구글 로그인 - iOS */
+  loginWithGoogleNative: (idToken: string) => Promise<void>;
+
   /** 로그아웃 */
   logout: () => Promise<void>;
 
@@ -53,6 +56,12 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   loginWithGoogle: async (idToken) => {
     const res = await authApi.loginWithGoogle(idToken);
+    await tokenManager.setTokens(res.accessToken, res.refreshToken);
+    set({ user: res.user, isAuthenticated: true });
+  },
+
+  loginWithGoogleNative: async (idToken) => {
+    const res = await authApi.loginWithGoogleNative(idToken);
     await tokenManager.setTokens(res.accessToken, res.refreshToken);
     set({ user: res.user, isAuthenticated: true });
   },

@@ -21,6 +21,7 @@ export const postsApi = {
 
   /** 게시물 생성 (multipart/form-data) */
   async create(formData: FormData): Promise<Post> {
+    console.log('createPost', formData);
     const { data } = await apiClient.post<{ data: Post }>('/api/posts', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

@@ -1,21 +1,30 @@
 import { View, Text, Pressable, Platform, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useAuthStore } from '@/features/auth/useAuthStore';
+import { appConfig } from '@/shared/config';
+import { useEffect } from 'react';
+import { router } from 'expo-router';
 
 export default function LoginScreen() {
-  const { loginWithApple, loginWithGoogle } = useAuthStore();
+  const { loginWithApple, loginWithGoogle, loginWithGoogleNative  } = useAuthStore();
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: appConfig.googleWebClientId,
+      offlineAccess: true,
+    });
+  }, []);
 
   const handleAppleLogin = async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
+        requestedScopes: [],
       });
       if (credential.identityToken) {
-        await loginWithApple(credential.identityToken, credential.authorizationCode ?? undefined);
+        await loginWithApple(credential.identityToken, credential.authorizationCode ?? "");
+        router.back();
       }
     } catch (error: unknown) {
       const e = error as { code?: string };
@@ -28,10 +37,32 @@ export default function LoginScreen() {
 
   const handleGoogleLogin = async () => {
     try {
-      // Google Sign-In 로직 (네이티브 모듈 초기화 필요)
-      // TODO: GoogleSignin.configure() 후 signIn() → idToken 추출
-      Alert.alert('안내', 'Google 로그인은 네이티브 빌드에서 사용 가능합니다.');
-    } catch {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const response = await GoogleSignin.signIn();
+      const idToken = response.data?.idToken;
+
+      if (!idToken) {
+        Alert.alert('로그인 실패', 'ID 토큰을 가져올 수 없습니다.');
+        return;
+      }
+
+      if (Platform.OS === 'ios') {
+        await loginWithGoogleNative(idToken);
+        router.replace('/(tabs)/map')
+        return;
+      }
+
+      await loginWithGoogle(idToken);
+      router.replace('/(tabs)/map')
+    } catch (error: unknown) {
+      const e = error as { code?: string };
+      console.log(error);
+      if (e.code === statusCodes.SIGN_IN_CANCELLED) return;
+      if (e.code === statusCodes.IN_PROGRESS) return;
+      if (e.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        Alert.alert('오류', 'Google Play 서비스를 사용할 수 없습니다.');
+        return;
+      }
       Alert.alert('로그인 실패', '구글 로그인에 실패했습니다.');
     }
   };
