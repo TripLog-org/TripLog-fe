@@ -20,11 +20,6 @@ function deltaToZoom(latDelta: number): number {
   return Math.round(Math.log2(360 / latDelta));
 }
 
-function toAbsoluteUrl(url: string) {
-  if (url.startsWith('https')) return url;
-  return `${appConfig.apiBaseUrlProduction}${url}`;
-}
-
 export default function MapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -70,7 +65,7 @@ export default function MapScreen() {
               style={{ width: MARKER_SIZE, height: MARKER_SIZE, borderRadius: MARKER_SIZE, overflow: 'hidden', borderWidth: 2, borderColor: '#fff' }}
             >
               <Image
-                source={{ uri: toAbsoluteUrl(item.photo.thumbnail) }}
+                source={{ uri: item.photo.thumbnail }}
                 style={{ width: '100%', height: '100%' }}
                 resizeMode="cover"
               />

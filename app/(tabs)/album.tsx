@@ -49,7 +49,7 @@ export default function AlbumScreen() {
       >
         {thumbnail ? (
           <Image
-            source={{ uri: appConfig.apiBaseUrlProduction + thumbnail }}
+            source={{ uri: thumbnail }}
             style={{ width: ITEM_SIZE, height: ITEM_SIZE }}
             resizeMode="cover"
           />

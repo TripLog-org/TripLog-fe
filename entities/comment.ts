@@ -3,6 +3,7 @@ export interface Comment {
   author: {
     _id: string;
     email: string;
+    nickname: string;
   };
   content: string;
   likeCount: number;

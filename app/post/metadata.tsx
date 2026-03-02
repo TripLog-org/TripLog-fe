@@ -111,7 +111,7 @@ export default function MetadataScreen() {
   const handleSubmit = () => {
     const { isAuthenticated } = useAuthStore.getState();
 
-    if (!isAuthenticated) {
+    if (isAuthenticated) {
       Alert.alert('안내', '로그인 후 이용해주세요.', [
         { text: '취소', style: 'cancel' },
         { text: '로그인', onPress: () => router.replace('/(auth)/login') },
@@ -144,7 +144,10 @@ export default function MetadataScreen() {
           router.dismissAll();
           router.replace('/(tabs)/map');
         },
-        onError: () => Alert.alert('오류', '게시물 작성에 실패했습니다.'),
+        onError: (error) => {
+          console.log(error)
+          Alert.alert('오류', '게시물 작성에 실패했습니다.');
+        },
       });
     }
   };
@@ -156,8 +159,6 @@ export default function MetadataScreen() {
       }
     },
   ).current;
-
-  if (!images.length) return null;
 
   return (
     <>

@@ -56,7 +56,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       '@react-native-google-signin/google-signin',
       {
-        iosUrlScheme: 'com.googleusercontent.apps.YOUR_IOS_CLIENT_ID',
+        iosUrlScheme: process.env.IOS_GOOGLE_CLIENT_ID,
       },
     ],
     '@react-native-community/datetimepicker',
@@ -64,7 +64,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     apiBaseUrlDevelopment: process.env.API_BASE_URL_DEVELOPMENT,
     apiBaseUrlProduction: process.env.API_BASE_URL_PRODUCTION,
-    iosGoogleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY,
-    androidGoogleMapsApiKey: process.env.ANDROID_GOOGLE_MAPS_API_KEY,
   },
 });

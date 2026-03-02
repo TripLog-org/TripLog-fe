@@ -140,7 +140,7 @@ export default function PostDetailScreen() {
               keyExtractor={(item) => item._id}
               renderItem={({ item }) => (
                 <Image
-                  source={{ uri: appConfig.apiBaseUrlProduction + item.url }}
+                  source={{ uri: item.url }}
                   style={{ width: width, height: width }}
                   resizeMode="cover"
                 />
@@ -154,7 +154,7 @@ export default function PostDetailScreen() {
               <View className="h-8 w-8 items-center justify-center rounded-full bg-primary/10">
                 <Ionicons name="person" size={16} color="#4A90D9" />
               </View>
-              <Text className="text-sm font-semibold text-text">{post.author?.email?.split('@')[0]}</Text>
+              <Text className="text-sm font-semibold text-text">{post.author?.nickname || 'Unknown User'}</Text>
               <Text className="text-xs text-text-tertiary">{timeAgo(post.createdAt)}</Text>
             </View>
 
@@ -210,7 +210,7 @@ export default function PostDetailScreen() {
                 <View className="flex-1">
                   <View className="flex-row items-center gap-2">
                     <Text className="text-xs font-semibold text-text">
-                      {comment.author?.email?.split('@')[0] ?? 'Unknown User'}
+                      {comment.author?.nickname || 'Unknown User'}
                     </Text>
                     <Text className="text-xs text-text-tertiary">
                       {timeAgo(comment.createdAt)}

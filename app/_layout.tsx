@@ -25,25 +25,6 @@ function RootLayoutNav() {
     initialize();
   }, [initialize]);
 
-  // useEffect(() => {
-  //   if (isLoading) return;
-
-  //   const inAuthGroup = segments[0] === '(auth)';
-
-  //   // if (!isAuthenticated && !inAuthGroup) {
-  //   //   router.replace('/(auth)/login');
-  //   // } else if (isAuthenticated && inAuthGroup) {
-  //   //   router.replace('/(tabs)/map');
-  //   // }
-
-  //   router.replace('/(tabs)/map');
-
-  // }, [isAuthenticated, isLoading, segments, router]);
-
-  // if (isLoading) {
-  //   return <LoadingSpinner />;
-  // }
-
   return (
     <>
       <StatusBar style="dark" />

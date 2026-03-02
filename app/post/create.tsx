@@ -76,7 +76,17 @@ export default function PostCreateScreen() {
     setTags((prev) => prev.filter((t) => t !== tag));
   };
 
-  const handleNext = () => {
+  const handleNext = () => {  
+    if (images.length === 0) {
+      Alert.alert('안내', '사진을 추가해주세요.');
+      return;
+    }
+
+    if (content.trim() === '') {
+      Alert.alert('안내', '내용을 입력해주세요.');
+      return;
+    }
+
     const imagesWithMeta: ImageWithMeta[] = images.map((img) => {
       const exif = img.exif as Record<string, unknown> | undefined;
       const gps = exif?.GPSLatitude

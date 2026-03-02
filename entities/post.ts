@@ -19,6 +19,7 @@ export interface PostImage {
 export interface PostAuthor {
   _id: string;
   email: string;
+  nickname: string;
 }
 
 export interface Post {
