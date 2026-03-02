@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Pressable, Alert, FlatList, TextInput, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, Image, Pressable, Alert, FlatList, TextInput, useWindowDimensions, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { usePostDetail } from '@/features/posts/usePostDetail';
 import { useTogglePostLike, useDeletePost } from '@/features/posts/usePosts';
@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { timeAgo } from '@/shared/utils/formatDate';
 import { useAuthStore } from '@/features/auth/useAuthStore';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { appConfig } from '@/shared/config';
 import { useToggleBookmark } from '@/features/recommend/useBookmarks';
@@ -24,6 +24,27 @@ export default function PostDetailScreen() {
   const createComment = useCreateComment(id);
   const [commentText, setCommentText] = useState('');
   const { width } = useWindowDimensions();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const idx = Math.round(e.nativeEvent.contentOffset.x / width);
+    setCurrentImageIndex(idx);
+  }, [width]);
+
+  const currentImage = post?.images?.[currentImageIndex];
+
+  const formatCapturedAt = (val?: string) => {
+    if (!val) return '';
+    const d = new Date(val.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3'));
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+      + ' ' + d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
+  const getLocationText = (img?: typeof currentImage) => {
+    if (!img?.location) return '';
+    return img.location.address || img.location.name || '';
+  };
 
   const isAuthor = user && user.id === post?.author?._id;
 
@@ -130,22 +151,59 @@ export default function PostDetailScreen() {
 
       <SafeAreaView className="flex-1 bg-white" edges={['bottom']}>
         <ScrollView className="flex-1">
-          {/* 이미지 갤러리 */}
+          {/* 이미지 슬라이더 */}
           {post.images.length > 0 && (
-            <FlatList
-              data={post.images}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item) => item._id}
-              renderItem={({ item }) => (
-                <Image
-                  source={{ uri: item.url }}
-                  style={{ width: width, height: width }}
-                  resizeMode="cover"
-                />
+            <View>
+              <FlatList
+                data={post.images}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onScroll={onScroll}
+                scrollEventThrottle={16}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => (
+                  <Image
+                    source={{ uri: item.url }}
+                    style={{ width, height: width }}
+                    resizeMode="cover"
+                  />
+                )}
+              />
+
+              {/* 위치 + 날짜 오버레이 */}
+              {(getLocationText(currentImage) || formatCapturedAt(currentImage?.capturedAt)) && (
+                <View className="flex-row items-center justify-between bg-gray-100 px-4 py-2.5">
+                  {getLocationText(currentImage) ? (
+                    <View className="flex-1 flex-row items-center gap-1.5">
+                      <Ionicons name="location-sharp" size={14} color="#555" />
+                      <Text className="text-xs text-text-secondary" numberOfLines={1}>
+                        {getLocationText(currentImage)}
+                      </Text>
+                    </View>
+                  ) : <View className="flex-1" />}
+                  {formatCapturedAt(currentImage?.capturedAt) ? (
+                    <Text className="text-xs text-text-tertiary ml-3">
+                      {formatCapturedAt(currentImage?.capturedAt)}
+                    </Text>
+                  ) : null}
+                </View>
               )}
-            />
+
+              {/* 페이지 인디케이터 */}
+              {post.images.length > 1 && (
+                <View className="flex-row items-center justify-center gap-1.5 py-3">
+                  {post.images.map((_, i) => (
+                    <View
+                      key={i}
+                      className={`h-1.5 rounded-full ${
+                        i === currentImageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
           )}
 
           {/* 본문 */}
