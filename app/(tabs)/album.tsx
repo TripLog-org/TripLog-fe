@@ -37,15 +37,13 @@ export default function AlbumScreen() {
     });
   }, [posts, searchText]);
 
-  console.log('posts', posts);
-
-  const renderItem = ({ item }: { item: Post }) => {  
-    const thumbnail = item.images?.[0]?.thumbnail
+  const renderItem = ({ item }: { item: Post }) => {
+    const thumbnail = item.images?.[0]?.thumbnail;
     return (
       <Pressable
         onPress={() => router.push(`/post/${item._id}`)}
         style={{ width: ITEM_SIZE, height: ITEM_SIZE }}
-        className="border-[0.5px] border-white/20"
+        className="border-[0.5px] border-white/20 relative"
       >
         {thumbnail ? (
           <Image
@@ -59,6 +57,13 @@ export default function AlbumScreen() {
             className="items-center justify-center bg-surface"
           >
             <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+          </View>
+        )}
+
+        {item.images && item.images.length > 1 && (
+          <View className="absolute right-1.5 top-1.5">
+            <View className="h-3.5 w-3.5 rounded-[2px] border border-white/60 bg-black/25" />
+            <View className="absolute -right-0.5 -bottom-0.5 h-3.5 w-3.5 rounded-[2px] border border-white bg-black/40" />
           </View>
         )}
       </Pressable>
