@@ -4,13 +4,35 @@ import { MapPostsParams } from '@/entities/post';
 
 const POSTS_KEY = ['posts'];
 
-/** 게시물 무한 스크롤 목록 */
+/** 게시물 무한 스크롤 목록 조회 */
 export function usePosts(pageSize = 20) {
   return useInfiniteQuery({
     queryKey: POSTS_KEY,
     queryFn: ({ pageParam = 1 }) => postsApi.getList(pageParam, pageSize),
     getNextPageParam: (lastPage) => {
       const currentPage = Number(lastPage.currentPage);
+      return currentPage < lastPage.totalPages ? currentPage + 1 : undefined;
+    },
+    initialPageParam: 1,
+  });
+}
+
+/** 지도 마커용 게시물 조회 */
+export function useMapPosts(params: MapPostsParams) {
+  return useQuery({
+    queryKey: ['mapPosts', params],
+    queryFn: () => postsApi.getMapPosts(params),
+    enabled: params.latitude !== 0 && params.longitude !== 0,
+  });
+}
+
+/** 내 게시물 조회 */
+export function useMyPosts(pageSize = 10) {
+  return useInfiniteQuery({
+    queryKey: POSTS_KEY,
+    queryFn: ({ pageParam = 1 }) => postsApi.getMyPosts(pageParam, pageSize),
+    getNextPageParam: (lastPage) => {
+      const currentPage = Number(lastPage.currentPage); 
       return currentPage < lastPage.totalPages ? currentPage + 1 : undefined;
     },
     initialPageParam: 1,
@@ -48,15 +70,6 @@ export function useDeletePost() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: POSTS_KEY });
     },
-  });
-}
-
-/** 지도 마커용 게시물 조회 */
-export function useMapPosts(params: MapPostsParams) {
-  return useQuery({
-    queryKey: ['mapPosts', params],
-    queryFn: () => postsApi.getMapPosts(params),
-    enabled: params.latitude !== 0 && params.longitude !== 0,
   });
 }
 

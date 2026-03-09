@@ -7,9 +7,22 @@ export const postsApi = {
     const { data } = await apiClient.get<PostListResponse>('/api/posts', {
       params: { page, pageSize },
     });
+    return data;
+  },
 
-    console.log('GET Posts', data);
+  /** 지도 마커용 게시물 조회 */
+  async getMapPosts(params: MapPostsParams): Promise<MapPostsResponse> {
+    const { data } = await apiClient.get<MapPostsResponse>('/api/posts/map', {
+      params,
+    });
+    return data;
+  },
 
+  /** 내 게시물 조회 */
+  async getMyPosts(page = 1, pageSize = 10): Promise<PostListResponse> {
+    const { data } = await apiClient.get<PostListResponse>('/api/posts/my', {
+      params: { page, pageSize },
+    });
     return data;
   },
 
@@ -37,14 +50,6 @@ export const postsApi = {
   /** 게시물 삭제 */
   async remove(postId: string): Promise<void> {
     await apiClient.delete(`/api/posts/${postId}`);
-  },
-
-  /** 지도 마커용 게시물 조회 */
-  async getMapPosts(params: MapPostsParams): Promise<MapPostsResponse> {
-    const { data } = await apiClient.get<MapPostsResponse>('/api/posts/map', {
-      params,
-    });
-    return data;
   },
 
   /** 게시물 좋아요 토글 */

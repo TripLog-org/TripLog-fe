@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/features/auth/useAuthStore';
-import { usePosts } from '@/features/posts/usePosts';
+import { useMyPosts } from '@/features/posts/usePosts';
 import { appConfig } from '@/shared/config';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -19,7 +19,7 @@ const COLUMNS = 3;
 export default function MyPageScreen() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const { data } = usePosts();
+  const { data } = useMyPosts();
   const { width } = useWindowDimensions();
 
   useEffect(() => {
@@ -37,27 +37,22 @@ export default function MyPageScreen() {
     [posts],
   );
 
-  const allImages = useMemo(
-    () =>
-      posts.flatMap((post) =>
-        post.images.map((img) => ({
-          postId: post._id,
-          uri: img.url.startsWith('http')
-            ? img.url
-            : `${appConfig.apiBaseUrl}${img.url}`,
-        })),
-      ),
-    [posts],
-  );
-
   return (
     <ScrollView className="flex-1 bg-white">
       {/* ── 프로필 헤더 ── */}
       <View className="flex-row items-center justify-between px-5 pb-4 pt-4">
         <View className="flex-row items-center rounded-full border border-border px-3 py-1.5">
-          <Ionicons name="person-circle-outline" size={18} color="#1A1A1A" />
+          {user?.profileImage ? (
+            <Image
+              source={{ uri: user.profileImage }}
+              style={{ width: 18, height: 18 }}
+              className="rounded-full"
+            />
+          ) : (
+            <Ionicons name="person-circle-outline" size={18} color="#1A1A1A" />
+          )}
           <Text className="ml-1.5 text-sm font-semibold text-text">
-            {user?.name ?? '사용자'} 님
+            {user?.nickname ?? '사용자'} 님
           </Text>
         </View>
 
@@ -94,22 +89,32 @@ export default function MyPageScreen() {
       </View>
 
       {/* ── 사진 그리드 / 빈 상태 ── */}
-      {allImages.length > 0 ? (
+      {posts.length > 0 ? (
         <View
           className="flex-row flex-wrap"
           style={{ gap: GRID_GAP }}
         >
-          {allImages.map((img, index) => (
+          {posts.map((post, index) => (
             <Pressable
-              key={`${img.postId}-${index}`}
-              onPress={() => router.push(`/post/${img.postId}`)}
+              key={`${post._id}-${index}`}
+              onPress={() => router.push(`/post/${post._id}`)}
+              style={{ width: imageSize, height: imageSize }}
             >
-              <Image
-                source={{ uri: img.uri }}
-                style={{ width: imageSize, height: imageSize }}
-                resizeMode="cover"
-              />
-            </Pressable>
+              {post.images.length > 0 ? (
+                <Image
+                  source={{ uri: post.images[0].url }}
+                  style={{ width: imageSize, height: imageSize }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View
+                    style={{ width: imageSize, height: imageSize }}
+                    className="items-center justify-center bg-surface"
+                  >
+                    <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+                  </View>
+                )}
+              </Pressable>
           ))}
         </View>
       ) : (

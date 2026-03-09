@@ -24,7 +24,7 @@ export default function LoginScreen() {
       });
       if (credential.identityToken) {
         await loginWithApple(credential.identityToken, credential.authorizationCode ?? "");
-        router.back();
+        router.replace('/(tabs)/map')
       }
     } catch (error: unknown) {
       const e = error as { code?: string };

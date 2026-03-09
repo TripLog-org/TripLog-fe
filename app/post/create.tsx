@@ -95,6 +95,9 @@ export default function PostCreateScreen() {
             longitude: Number(exif.GPSLongitude),
           }
         : undefined;
+
+      console.log('exif', exif);
+      
       const dateStr =
         (exif?.DateTimeOriginal as string) ?? (exif?.DateTime as string);
 

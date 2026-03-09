@@ -37,6 +37,8 @@ export default function MapScreen() {
   const { data } = useMapPosts(mapParams);
   const markers = data?.data ?? [];
 
+  console.log('data', data);
+
   const handleRegionChange = useCallback((newRegion: Region) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => setRegion(newRegion), 400);

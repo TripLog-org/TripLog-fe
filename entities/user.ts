@@ -1,7 +1,7 @@
 export interface User {
-  id: string;
+  _id: string;
   email: string;
-  name: string;
+  nickname: string;
   provider: 'apple' | 'google';
   profileImage?: string;
   createdAt?: string;

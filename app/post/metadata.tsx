@@ -21,6 +21,7 @@ import { useCreatePost } from '@/features/posts/usePosts';
 import * as Location from 'expo-location';
 import { useAuthStore } from '@/features/auth/useAuthStore';
 import { compressImage } from '@/shared/utils/compressImage';
+import { AxiosError } from 'axios';
 
 export default function MetadataScreen() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function MetadataScreen() {
     useCreatePostStore();
   const createPost = useCreatePost();
 
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(new Date());
@@ -87,7 +89,7 @@ export default function MetadataScreen() {
   }, [currentIndex, current?.locationName, current?.latitude, current?.longitude]);
 
   const openDatePicker = () => {
-    setTempDate(parseDateSafe(current.capturedAt));
+    setTempDate(parseDateSafe(current?.capturedAt));
     setShowDatePicker(true);
   };
 
@@ -120,6 +122,8 @@ export default function MetadataScreen() {
       return;
     }
 
+    setIsButtonDisabled(true);
+
     try {
       const compressedUris = await Promise.all(
         images.map((img) => compressImage(img.uri)),
@@ -134,9 +138,11 @@ export default function MetadataScreen() {
         latitude: img.latitude,
         longitude: img.longitude,
         locationName: img.locationName,
-        capturedAt: img.capturedAt,
+        capturedAt: parseDateSafe(img.capturedAt).toISOString(),
       }));
       formData.append('imageMeta', JSON.stringify(imageMeta));
+
+      console.log('imageMeta capturedAt', imageMeta.map((img) => img.capturedAt));
 
       compressedUris.forEach((uri, i) => {
         formData.append('images', {
@@ -149,15 +155,20 @@ export default function MetadataScreen() {
       createPost.mutate(formData, {
         onSuccess: () => {
           reset();
+          setIsButtonDisabled(false);
           router.dismissAll();
-          router.replace('/(tabs)/map');
+          router.replace('/(tabs)/map');    
+          Alert.alert('안내', '게시물 작성에 성공했습니다.');
         },
         onError: (error) => {
+          setIsButtonDisabled(false);
           console.log(error);
+          console.log('error.response.data', (error as AxiosError).response?.data);
           Alert.alert('오류', '게시물 작성에 실패했습니다.');
         },
       });
     } catch {
+      setIsButtonDisabled(false);
       Alert.alert('오류', '이미지 압축에 실패했습니다.');
     }
   };
@@ -263,7 +274,7 @@ export default function MetadataScreen() {
             </View>
             <View className="mt-2 rounded-xl border border-border bg-white px-4 py-3">
               <Text className="text-sm text-text-secondary">
-                {formatDate(current.capturedAt)}
+                {formatDate(current?.capturedAt)}
               </Text>
             </View>
           </View>
@@ -273,11 +284,11 @@ export default function MetadataScreen() {
         <View className="px-5 pb-4 pt-2">
           <Pressable
             onPress={handleSubmit}
-            disabled={createPost.isPending}
+            disabled={createPost.isPending || isButtonDisabled}
             className="items-center rounded-full bg-primary py-4"
           >
             <Text className="text-base font-semibold text-white">
-              {createPost.isPending ? '등록 중...' : '등록'}
+              {createPost.isPending || isButtonDisabled ? '등록 중...' : '등록'}
             </Text>
           </Pressable>
         </View>

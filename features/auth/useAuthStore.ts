@@ -41,6 +41,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
       const user = await usersApi.getMe();
+      console.log('initialize user', user);
       set({ user, isAuthenticated: true, isLoading: false });
     } catch {
       await tokenManager.clearTokens();

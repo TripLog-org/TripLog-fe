@@ -20,6 +20,7 @@ export interface PostAuthor {
   _id: string;
   email: string;
   nickname: string;
+  profileImage?: string;
 }
 
 export interface Post {

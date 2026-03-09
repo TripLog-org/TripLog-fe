@@ -46,7 +46,7 @@ export default function PostDetailScreen() {
     return img.location.address || img.location.name || '';
   };
 
-  const isAuthor = user && user.id === post?.author?._id;
+  const isAuthor = user && user._id === post?.author?._id;
 
   const handleBookmark = () => {
     if (!isAuthenticated) {
@@ -209,9 +209,17 @@ export default function PostDetailScreen() {
           {/* 본문 */}
           <View className="p-4">
             <View className="flex-row items-center gap-2">
-              <View className="h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <Ionicons name="person" size={16} color="#4A90D9" />
-              </View>
+              {post.author?.profileImage ? (
+                <Image
+                  source={{ uri: post.author.profileImage }}
+                  style={{ width: 24, height: 24 }}
+                  className="rounded-full"
+                />
+              ) : (
+                <View className="h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                  <Ionicons name="person" size={16} color="#4A90D9" />
+                </View>
+              )}
               <Text className="text-sm font-semibold text-text">{post.author?.nickname || 'Unknown User'}</Text>
               <Text className="text-xs text-text-tertiary">{timeAgo(post.createdAt)}</Text>
             </View>

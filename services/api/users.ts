@@ -4,8 +4,8 @@ import { apiClient } from './client';
 export const usersApi = {
   /** 내 정보 조회 */
   async getMe(): Promise<User> {
-    const { data } = await apiClient.get<{ data: User }>('/api/users/me');
-    return data.data;
+    const { data } = await apiClient.get<User>('/api/users/me');
+    return data;
   },
 
   /** 내 정보 수정 */
