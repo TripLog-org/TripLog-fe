@@ -14,7 +14,7 @@ import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Post } from '@/entities/post';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { appConfig } from '@/shared/config';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const NUM_COLUMNS = 3;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -62,8 +62,7 @@ export default function AlbumScreen() {
 
         {item.images && item.images.length > 1 && (
           <View className="absolute right-1.5 top-1.5">
-            <View className="h-3.5 w-3.5 rounded-[2px] border border-white/60 bg-black/25" />
-            <View className="absolute -right-0.5 -bottom-0.5 h-3.5 w-3.5 rounded-[2px] border border-white bg-black/40" />
+            <MaterialCommunityIcons name="image-multiple" size={20} color="white" />
           </View>
         )}
       </Pressable>

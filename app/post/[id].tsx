@@ -26,6 +26,8 @@ export default function PostDetailScreen() {
   const { width } = useWindowDimensions();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  console.log('post id', id);
+
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const idx = Math.round(e.nativeEvent.contentOffset.x / width);
     setCurrentImageIndex(idx);

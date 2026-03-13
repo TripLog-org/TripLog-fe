@@ -20,15 +20,16 @@ export default function LoginScreen() {
   const handleAppleLogin = async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [],
+        requestedScopes: [AppleAuthentication.AppleAuthenticationScope.EMAIL],
       });
+      console.log('credential', credential);
       if (credential.identityToken) {
         await loginWithApple(credential.identityToken, credential.authorizationCode ?? "");
         router.replace('/(tabs)/map')
       }
     } catch (error: unknown) {
+      console.log('error', error);
       const e = error as { code?: string };
-      console.log(e.code);
       if (e.code !== 'ERR_REQUEST_CANCELED') {
         Alert.alert('로그인 실패', '애플 로그인에 실패했습니다.');
       }

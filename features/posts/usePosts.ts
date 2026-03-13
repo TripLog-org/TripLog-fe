@@ -2,12 +2,10 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import { postsApi } from '@/services/api/posts';
 import { MapPostsParams } from '@/entities/post';
 
-const POSTS_KEY = ['posts'];
-
 /** 게시물 무한 스크롤 목록 조회 */
 export function usePosts(pageSize = 20) {
   return useInfiniteQuery({
-    queryKey: POSTS_KEY,
+    queryKey: ['posts', pageSize],
     queryFn: ({ pageParam = 1 }) => postsApi.getList(pageParam, pageSize),
     getNextPageParam: (lastPage) => {
       const currentPage = Number(lastPage.currentPage);
@@ -29,7 +27,7 @@ export function useMapPosts(params: MapPostsParams) {
 /** 내 게시물 조회 */
 export function useMyPosts(pageSize = 10) {
   return useInfiniteQuery({
-    queryKey: POSTS_KEY,
+    queryKey: ['myPosts', pageSize],
     queryFn: ({ pageParam = 1 }) => postsApi.getMyPosts(pageParam, pageSize),
     getNextPageParam: (lastPage) => {
       const currentPage = Number(lastPage.currentPage); 
@@ -45,7 +43,7 @@ export function useCreatePost() {
   return useMutation({
     mutationFn: (formData: FormData) => postsApi.create(formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: POSTS_KEY });
+      queryClient.invalidateQueries({ queryKey: ['posts', 'create'] });
     },
   });
 }
@@ -57,7 +55,7 @@ export function useUpdatePost() {
     mutationFn: ({ postId, payload }: { postId: string; payload: { content?: string; tags?: string[]; visibility?: string } }) =>
       postsApi.update(postId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: POSTS_KEY });
+      queryClient.invalidateQueries({ queryKey: ['posts', 'update'] });
     },
   });
 }
@@ -68,7 +66,7 @@ export function useDeletePost() {
   return useMutation({
     mutationFn: (postId: string) => postsApi.remove(postId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: POSTS_KEY });
+      queryClient.invalidateQueries({ queryKey: ['posts', 'delete'] });
     },
   });
 }
@@ -79,7 +77,7 @@ export function useTogglePostLike() {
   return useMutation({
     mutationFn: (postId: string) => postsApi.toggleLike(postId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: POSTS_KEY });
+      queryClient.invalidateQueries({ queryKey: ['posts', 'toggleLike'] });
     },
   });
 }

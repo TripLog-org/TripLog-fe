@@ -10,8 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/features/auth/useAuthStore';
 import { useMyPosts } from '@/features/posts/usePosts';
-import { appConfig } from '@/shared/config';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const GRID_GAP = 2;
 const COLUMNS = 3;
@@ -111,7 +110,7 @@ export default function MyPageScreen() {
                     style={{ width: imageSize, height: imageSize }}
                     className="items-center justify-center bg-surface"
                   >
-                    <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+                    <MaterialCommunityIcons name="image-multiple" size={20} color="white" />
                   </View>
                 )}
               </Pressable>
