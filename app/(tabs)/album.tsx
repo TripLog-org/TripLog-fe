@@ -15,6 +15,7 @@ import { Post } from '@/entities/post';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRefreshOnFocus } from '@/shared/hooks/useRefreshOnFocus';
 
 const NUM_COLUMNS = 3;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -22,8 +23,11 @@ const ITEM_SIZE = SCREEN_WIDTH / NUM_COLUMNS;
 
 export default function AlbumScreen() {
   const router = useRouter();
-  const { data, isLoading, fetchNextPage, hasNextPage } = usePosts();
+  const { data, isLoading, fetchNextPage, hasNextPage, refetch } = usePosts();
   const [searchText, setSearchText] = useState('');
+
+  // 다른 사용자 게시물 반영을 위해 탭 진입 시마다 목록 조회
+  useRefreshOnFocus(refetch);
 
   const posts = data?.pages.flatMap((page) => page.data) ?? [];
   const filteredPosts = useMemo(() => {

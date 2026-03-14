@@ -43,7 +43,8 @@ export function useCreatePost() {
   return useMutation({
     mutationFn: (formData: FormData) => postsApi.create(formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts', 'create'] });
+      queryClient.invalidateQueries({ queryKey: ['myPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
   });
 }
@@ -55,7 +56,8 @@ export function useUpdatePost() {
     mutationFn: ({ postId, payload }: { postId: string; payload: { content?: string; tags?: string[]; visibility?: string } }) =>
       postsApi.update(postId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts', 'update'] });
+      queryClient.invalidateQueries({ queryKey: ['myPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
   });
 }
@@ -66,7 +68,8 @@ export function useDeletePost() {
   return useMutation({
     mutationFn: (postId: string) => postsApi.remove(postId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts', 'delete'] });
+      queryClient.invalidateQueries({ queryKey: ['myPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
   });
 }
@@ -77,7 +80,8 @@ export function useTogglePostLike() {
   return useMutation({
     mutationFn: (postId: string) => postsApi.toggleLike(postId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts', 'toggleLike'] });
+      queryClient.invalidateQueries({ queryKey: ['myPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
   });
 }

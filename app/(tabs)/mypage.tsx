@@ -11,15 +11,18 @@ import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/features/auth/useAuthStore';
 import { useMyPosts } from '@/features/posts/usePosts';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRefreshOnFocus } from '@/shared/hooks/useRefreshOnFocus';
 
-const GRID_GAP = 2;
+const GRID_GAP = 0;
 const COLUMNS = 3;
 
 export default function MyPageScreen() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const { data } = useMyPosts();
+  const { data, refetch } = useMyPosts();
   const { width } = useWindowDimensions();
+
+  useRefreshOnFocus(refetch);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -110,6 +113,12 @@ export default function MyPageScreen() {
                     style={{ width: imageSize, height: imageSize }}
                     className="items-center justify-center bg-surface"
                   >
+                    <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+                  </View>
+                )}
+
+                {post.images && post.images.length > 1 && (
+                  <View className="absolute right-1.5 top-1.5">
                     <MaterialCommunityIcons name="image-multiple" size={20} color="white" />
                   </View>
                 )}
