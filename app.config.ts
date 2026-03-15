@@ -19,9 +19,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'org.triplog.app',
-    config: {
-      googleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY,
-    },
     usesAppleSignIn: true,
     googleServicesFile: './GoogleService-Info.plist',
   },
@@ -32,11 +29,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     edgeToEdgeEnabled: true,
     package: 'org.triplog.app',
-    config: {
-      googleMaps: {
-        apiKey: process.env.ANDROID_GOOGLE_MAPS_API_KEY,
-      },
-    },
   },
   web: {
     favicon: './assets/favicon.png',
@@ -60,6 +52,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         iosUrlScheme: process.env.IOS_GOOGLE_CLIENT_ID,
       },
+    ],
+    [
+      "react-native-maps",
+      {
+        "androidGoogleMapsApiKey": process.env.ANDROID_GOOGLE_MAPS_API_KEY,
+        "iosGoogleMapsApiKey": process.env.IOS_GOOGLE_MAPS_API_KEY,
+      }
     ],
     '@react-native-community/datetimepicker',
   ],
