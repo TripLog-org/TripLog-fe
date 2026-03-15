@@ -68,7 +68,7 @@ export default function MyPageScreen() {
       </View>
 
       {/* ── 통계 + 여행 지도 보기 ── */}
-      <View className="flex-row items-center px-5 pb-4">
+      <View className="flex-row items-center px-5 pb-4 mb-2">
         <View className="flex-row items-center gap-4">
           <View className="flex-row items-center gap-1">
             <Text className="text-sm text-text-secondary">게시물</Text>

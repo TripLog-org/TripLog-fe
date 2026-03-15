@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, Image, Platform } from 'react-native';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { View, Text, TextInput, Pressable, Image, Platform, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
@@ -26,7 +26,8 @@ export default function MapScreen() {
   const [searchText, setSearchText] = useState('');
   const [region, setRegion] = useState<Region>(INITIAL_REGION);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
-
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  
   useEffect(() => {
     Location.requestForegroundPermissionsAsync();
   }, []);
@@ -40,6 +41,12 @@ export default function MapScreen() {
 
   const { data } = useMapPosts(mapParams);
   const markers = data?.data ?? [];
+  const filteredMarkers = useMemo(() => {
+    return markers.filter((marker) => {
+      if (isBookmarked) return marker.isBookmarked;
+      return true;
+    });
+  }, [markers, isBookmarked]);
 
   console.log('markers', markers);
 
@@ -55,11 +62,12 @@ export default function MapScreen() {
         style={{ flex: 1 }}
         initialRegion={INITIAL_REGION}
         onRegionChangeComplete={handleRegionChange}
+        onPress={() => Keyboard.dismiss()}
         showsUserLocation
         showsMyLocationButton
         mapPadding={Platform.OS === 'android' ? { top: insets.top + 40, bottom: insets.bottom + 0, left: 0, right: 0 } : { top: 0, bottom: 0, left: 0, right: 0 }}
       >
-        {markers.map((item, index) => (
+        {filteredMarkers.map((item, index) => (
           <Marker
             key={`${item.postId}-${index}`}
             coordinate={{
@@ -122,11 +130,11 @@ export default function MapScreen() {
 
         {/* 북마크 버튼 */}
         <Pressable
-          onPress={() => {}}
+          onPress={() => setIsBookmarked(!isBookmarked)}
           className="absolute right-3 h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm"
           style={Platform.OS === 'ios' ? { bottom: insets.bottom + 36 } : { bottom: 16 }}
         >
-          <Ionicons name="bookmark-outline" size={20} color="#555555" />
+          <Ionicons name={isBookmarked ? 'bookmark' : 'bookmark-outline'} size={22} color={isBookmarked ? '#4A90D9' : '#555555'} />
         </Pressable>
       </View>
     </View>

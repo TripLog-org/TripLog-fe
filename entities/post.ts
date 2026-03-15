@@ -90,6 +90,7 @@ export interface MapPost {
     profileImage?: string;
   } | null;
   createdAt: string;
+  isBookmarked: boolean;
 }
 
 export interface MapPostsResponse {

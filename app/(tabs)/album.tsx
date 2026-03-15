@@ -7,6 +7,8 @@ import {
   View,
   Text,
   TextInput,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { usePosts } from '@/features/posts/usePosts';
@@ -16,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRefreshOnFocus } from '@/shared/hooks/useRefreshOnFocus';
+import { bookmarksApi } from '@/services/api/bookmarks';
 
 const NUM_COLUMNS = 3;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -25,21 +28,26 @@ export default function AlbumScreen() {
   const router = useRouter();
   const { data, isLoading, fetchNextPage, hasNextPage, refetch } = usePosts();
   const [searchText, setSearchText] = useState('');
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
-  // 다른 사용자 게시물 반영을 위해 탭 진입 시마다 목록 조회
   useRefreshOnFocus(refetch);
 
-  const posts = data?.pages.flatMap((page) => page.data) ?? [];
+  const posts = useMemo(() => data?.pages.flatMap((page) => page.data) ?? [], [data]);
   const filteredPosts = useMemo(() => {
-    const query = searchText.trim().toLowerCase();
-    if (!query) return posts;
-
     return posts.filter((post) => {
+      const query = searchText.trim().toLowerCase();
       const contentMatched = post.content?.toLowerCase().includes(query);
       const tagsMatched = post.tags?.some((tag) => tag.toLowerCase().includes(query));
-      return contentMatched || tagsMatched;
+      if (isBookmarked && query) {
+        return (contentMatched || tagsMatched) && post.isBookmarked;
+      } else if (query) {
+        return contentMatched || tagsMatched;
+      } else if (isBookmarked) {
+        return post.isBookmarked;
+      }
+      return true;
     });
-  }, [posts, searchText]);
+  }, [posts, searchText, isBookmarked]);
 
   const renderItem = ({ item }: { item: Post }) => {
     const thumbnail = item.images?.[0]?.thumbnail;
@@ -78,25 +86,30 @@ export default function AlbumScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* 상단 헤더: 검색 + 북마크 */}
-      <View className="px-3 pb-2 pt-2">
-        <View className="flex-row items-center gap-2">
-          <View className="flex-1 flex-row items-center rounded-full border border-primary/60 bg-white px-3 py-2">
+      <View className="px-3 pb-2 pt-2 mb-2">
+        <View className="flex-row items-center gap-3">
+          <View className={`flex-1 flex-row items-center rounded-full border border-primary/60 bg-white px-3 ${Platform.OS === 'ios' ? 'py-2.5' : ''}`}>
             <Ionicons name="search" size={16} color="#8FC8F1" />
             <TextInput
               value={searchText}
               onChangeText={setSearchText}
-              placeholder="해시태그 검색"
+              placeholder="해시태그 또는 내용 검색"
               placeholderTextColor="#9CA3AF"
               className="ml-2 flex-1 text-sm text-text"
               returnKeyType="search"
             />
+            {searchText.length > 0 && (
+              <Pressable onPress={() => setSearchText('')} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              </Pressable>
+            )}
           </View>
 
           <Pressable
-            onPress={() => {}}
-            className="h-9 w-9 items-center justify-center rounded-full border border-border bg-white"
+            onPress={() => setIsBookmarked(!isBookmarked)}
+            className={`h-12 w-12 items-center justify-center rounded-full border ${isBookmarked ? 'border-primary' : 'border-border'} bg-white`}
           >
-            <Ionicons name="bookmark-outline" size={16} color="#9CA3AF" />
+            <Ionicons name={isBookmarked ? 'bookmark' : 'bookmark-outline'} size={20} color={isBookmarked ? '#4A90D9' : '#9CA3AF'} />
           </Pressable>
         </View>
       </View>
@@ -111,12 +124,12 @@ export default function AlbumScreen() {
           onEndReachedThreshold={0.5}
         />
       ) : (
-        <View className="flex-1 items-center justify-center">
+        <Pressable className="flex-1 items-center justify-center" onPress={() => Keyboard.dismiss()}>
           <Ionicons name="images-outline" size={64} color="#D1D5DB" />
           <Text className="mt-4 text-base text-text-tertiary">
             {searchText ? '검색 결과가 없어요.' : '게시물이 없어요.'}
           </Text>
-        </View>
+        </Pressable>
       )}
 
       {/* 게시물 작성 FAB */}
