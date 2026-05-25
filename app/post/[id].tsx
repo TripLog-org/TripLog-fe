@@ -9,14 +9,14 @@ import { useAuthStore } from '@/features/auth/useAuthStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { appConfig } from '@/shared/config';
 import { useToggleBookmark } from '@/features/recommend/useBookmarks';
+import { useRefreshOnFocus } from '@/shared/hooks/useRefreshOnFocus';
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const { data: post, isLoading } = usePostDetail(id);
+  const { data: post, isLoading, refetch } = usePostDetail(id);
   const toggleLike = useTogglePostLike();
   const deletePost = useDeletePost();
   const toggleBookmark = useToggleBookmark();
@@ -27,6 +27,7 @@ export default function PostDetailScreen() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   console.log('post id', id);
+  useRefreshOnFocus(refetch);
 
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const idx = Math.round(e.nativeEvent.contentOffset.x / width);
@@ -124,7 +125,7 @@ export default function PostDetailScreen() {
                   <Ionicons
                     name={post.isBookmarked ? 'bookmark' : 'bookmark-outline'}
                     size={22}
-                    color={post.isBookmarked ? '#4A90D9' : '#9CA3AF'}
+                    color={post.isBookmarked ? '#4A90D9' : '#1A1A1A'}
                   />
                 </Pressable>
                 <Pressable onPress={() => router.push(`/post/edit/${id}`)}>
@@ -140,11 +141,11 @@ export default function PostDetailScreen() {
                   <Ionicons
                     name={post.isBookmarked ? 'bookmark' : 'bookmark-outline'}
                     size={22}
-                    color={post.isBookmarked ? '#4A90D9' : '#9CA3AF'}
+                    color={post.isBookmarked ? '#4A90D9' : '#1A1A1A'}
                   />
                 </Pressable>
                 <Pressable onPress={handleReport}>
-                  <Ionicons name="flag-outline" size={22} color="#9CA3AF" />
+                  <Ionicons name="flag-outline" size={22} color="#1A1A1A" />
                 </Pressable>
               </View>
             ),

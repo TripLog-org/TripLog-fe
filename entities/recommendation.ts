@@ -1,17 +1,15 @@
 export interface Recommendation {
-  _id: string;
+  id: string;
   title: string;
   description?: string;
   category: string;
   region?: string;
-  imageUrl?: string;
+  coverImage?: string;
   address?: string;
-  coordinates?: {
-    latitude: number;
-    longitude: number;
-  };
+  tags?: string[];
+  telephone?: string;
   isBookmarked?: boolean;
-  createdAt?: string;
+  source?: string;
 }
 
 export interface RecommendationListResponse {

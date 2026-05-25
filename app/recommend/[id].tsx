@@ -4,6 +4,7 @@ import { useRecommendationDetail } from '@/features/recommend/useRecommendations
 import { useToggleBookmark, useBookmarkCheck } from '@/features/recommend/useBookmarks';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 import { Ionicons } from '@expo/vector-icons';
+import { normalizeRemoteImageUri } from '@/shared/utils/imageUrl';
 
 export default function RecommendDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -14,6 +15,7 @@ export default function RecommendDetailScreen() {
   if (isLoading || !item) return <LoadingSpinner />;
 
   const isBookmarked = bookmarkStatus?.isBookmarked ?? item.isBookmarked;
+  const imageUri = normalizeRemoteImageUri(item.imageUrl ?? item.coverImage);
 
   return (
     <>
@@ -33,9 +35,9 @@ export default function RecommendDetailScreen() {
       />
 
       <ScrollView className="flex-1 bg-white">
-        {item.imageUrl && (
+        {imageUri && (
           <Image
-            source={{ uri: item.imageUrl }}
+            source={{ uri: imageUri }}
             className="h-64 w-full"
             resizeMode="cover"
           />

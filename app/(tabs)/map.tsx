@@ -132,7 +132,7 @@ export default function MapScreen() {
         <Pressable
           onPress={() => setIsBookmarked(!isBookmarked)}
           className="absolute right-3 h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm"
-          style={Platform.OS === 'ios' ? { bottom: insets.bottom + 36 } : { bottom: 16 }}
+          style={Platform.OS === 'ios' ? { bottom: insets.bottom + 44 } : { bottom: 16 }}
         >
           <Ionicons name={isBookmarked ? 'bookmark' : 'bookmark-outline'} size={22} color={isBookmarked ? '#4A90D9' : '#555555'} />
         </Pressable>

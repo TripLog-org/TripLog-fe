@@ -18,7 +18,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRefreshOnFocus } from '@/shared/hooks/useRefreshOnFocus';
-import { bookmarksApi } from '@/services/api/bookmarks';
 
 const NUM_COLUMNS = 3;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -84,7 +83,7 @@ export default function AlbumScreen() {
   if (isLoading) return <LoadingSpinner />;
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       {/* 상단 헤더: 검색 + 북마크 */}
       <View className="px-3 pb-2 pt-2 mb-2">
         <View className="flex-row items-center gap-3">
